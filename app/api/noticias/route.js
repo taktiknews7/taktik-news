@@ -1,28 +1,29 @@
-import { NextResponse } from 'next/server';
-
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
   const cat = searchParams.get('cat') || 'El Salvador';
 
-  const feeds = {
-    'El Salvador': 'https://news.google.com/rss/search?q=El+Salvador&hl=es-419&gl=SV&ceid=SV:es-419',
-    'Internacional': 'https://news.google.com/rss/search?q=noticias+internacionales&hl=es-419&gl=SV&ceid=SV:es-419',
-    'Economía': 'https://news.google.com/rss/search?q=economia+El+Salvador&hl=es-419&gl=SV&ceid=SV:es-419',
-    'Política': 'https://news.google.com/rss/search?q=politica+El+Salvador+USA&hl=es-419&gl=SV&ceid=SV:es-419'
-  };
+  let query = 'El Salvador noticias';
+  if (cat === 'Internacional') query = 'noticias internacionales';
+  if (cat === 'Economia') query = 'El Salvador economia';
+  if (cat === 'Politica') query = 'El Salvador politica';
 
   try {
-    const url = feeds[cat] || feeds['El Salvador'];
-    const res = await fetch(url, { next: { revalidate: 60 } });
+    const res = await fetch(`https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=es-419&gl=SV&ceid=SV:es-419`, { next: { revalidate: 300 } });
     const xml = await res.text();
-    const items = [...xml.matchAll(/<item>(.*?)<\/item>/gs)].slice(0, 10).map(m => {
-      const b = m[1];
-      const t = b.match(/<title>(.*?)<\/title>/)?.[1] || '';
-      const l = b.match(/<link>(.*?)<\/link>/)?.[1] || '#';
-      return { title: t.replace(/<!\[CDATA\[|\]\]>/g,''), link: l, cat };
+
+    const items = [...xml.matchAll(/<item>(.*?)<\/item>/gs)].slice(0, 20).map(m => {
+      const block = m[1];
+      const title = (block.match(/<title>(.*?)<\/title>/)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g,'');
+      const link = block.match(/<link>(.*?)<\/link>/)?.[1] || '#';
+      return { title, link };
+    }).filter(n => {
+      // FILTRO: Quitamos CNN, Yahoo que dan el Agree
+      const bad = ['cnn.com', 'yahoo.com', 'bbc.com'];
+      return!bad.some(d => n.link.includes(d));
     });
-    return NextResponse.json(items);
+
+    return Response.json(items);
   } catch (e) {
-    return NextResponse.json([{ title: `Noticias de ${cat} - Actualizando...`, link: "#", cat }]);
+    return Response.json([]);
   }
 }
