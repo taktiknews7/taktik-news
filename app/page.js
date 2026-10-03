@@ -57,7 +57,7 @@ export default function Home() {
               </div>
               {cargando ? <div style={{padding:20}}>⏳ El robot está buscando noticias...</div> :
                 noticias.map((n,i)=>(
-                <a key={i} href={n.link} target="_blank" style={{display:'flex', gap:12, padding:'14px 16px', borderBottom:'1px solid #f0f0f0', textDecoration:'none', color:'black'}}>
+             <a key={i} href={`/noticia?title=${encodeURIComponent(n.title)}&link=${encodeURIComponent(n.link)}&cat=${encodeURIComponent(catActiva)}`} style={{display:'flex', gap:12, padding:'14px 16px', borderBottom:'1px solid #f0f0f0', textDecoration:'none', color:'black'}}   
                   <div style={{minWidth:44, height:44, background: catActiva==='El Salvador' ? '#00205b' : catActiva==='Internacional' ? '#b30000' : '#0a5c36', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:900, borderRadius:6, fontSize:12}}>{i+1}</div>
                   <div><div style={{fontSize:14, fontWeight:600, lineHeight:1.3}}>{n.title}</div><div style={{fontSize:11, color:'#888', marginTop:4}}>Fuente: Google News • {catActiva} • Click para leer completa →</div></div>
                 </a>
