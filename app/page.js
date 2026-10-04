@@ -5,7 +5,6 @@ export default function Home() {
   const [catActiva, setCatActiva] = useState('El Salvador');
   const [noticias, setNoticias] = useState([]);
   const [cargando, setCargando] = useState(true);
-
   const cats = ['El Salvador', 'Internacional', 'Economía', 'Política'];
 
   useEffect(() => {
@@ -30,7 +29,7 @@ export default function Home() {
             </div>
             <div style={{display:'flex', gap:6}}>
               {cats.map(c=>(
-                <button key={c} onClick={()=>setCatActiva(c)} style={{background: catActiva===c? '#c9a86a' : '#222', color: catActiva===c? 'black' : 'white', border: catActiva===c? '1px solid #c9a86a' : '1px solid #444', padding:'8px 14px', borderRadius:20, cursor:'pointer', fontWeight:700, fontSize:12, transition:'0.2s'}}>
+                <button key={c} onClick={()=>setCatActiva(c)} style={{background: catActiva===c? '#c9a86a' : '#222', color: catActiva===c? 'black' : 'white', border: catActiva===c? '1px solid #c9a86a' : '1px solid #444', padding:'8px 14px', borderRadius:20, cursor:'pointer', fontWeight:700, fontSize:12}}>
                   {c}
                 </button>
               ))}
@@ -44,7 +43,7 @@ export default function Home() {
 
         <div style={{maxWidth:1200, margin:'0 auto', padding:20, display:'grid', gridTemplateColumns:'1.7fr 0.8fr', gap:28}}>
           <div>
-            <span style={{background:'#c9a86a', padding:'4px 10px', fontSize:10, fontWeight:800, letterSpacing:1}}>{catActiva.toUpperCase()} • EN VIVO</span>
+            <span style={{background:'#c9a86a', padding:'4px 10px', fontSize:10, fontWeight:800}}>{catActiva.toUpperCase()} • EN VIVO</span>
             <h1 className="serif" style={{fontSize:34, lineHeight:1.1, marginTop:10}}>
               {cargando ? 'Cargando noticias...' : (noticias[0]?.title || `Últimas noticias de ${catActiva}`)}
             </h1>
@@ -57,11 +56,11 @@ export default function Home() {
               </div>
               {cargando ? <div style={{padding:20}}>⏳ El robot está buscando noticias...</div> :
                 noticias.map((n,i)=>(
-             <a key={i} href={`/noticia?title=${encodeURIComponent(n.title)}&link=${encodeURIComponent(n.link)}&cat=${encodeURIComponent(catActiva)}`} style={{display:'flex', gap:12, padding:'14px 16px', borderBottom:'1px solid #f0f0f0', textDecoration:'none', color:'black'}}   
-                  <div style={{minWidth:44, height:44, background: catActiva==='El Salvador' ? '#00205b' : catActiva==='Internacional' ? '#b30000' : '#0a5c36', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:900, borderRadius:6, fontSize:12}}>{i+1}</div>
-                  <div><div style={{fontSize:14, fontWeight:600, lineHeight:1.3}}>{n.title}</div><div style={{fontSize:11, color:'#888', marginTop:4}}>Fuente: Google News • {catActiva} • Click para leer completa →</div></div>
-                </a>
-              ))}
+                  <a key={i} href={`/noticia?title=${encodeURIComponent(n.title)}&link=${encodeURIComponent(n.link)}&cat=${encodeURIComponent(catActiva)}`} style={{display:'flex', gap:12, padding:'14px 16px', borderBottom:'1px solid #f0f0f0', textDecoration:'none', color:'black'}}>
+                    <div style={{minWidth:44, height:44, background: catActiva==='El Salvador' ? '#00205b' : catActiva==='Internacional' ? '#b30000' : '#0a5c36', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:900, borderRadius:6, fontSize:12}}>{i+1}</div>
+                    <div><div style={{fontSize:14, fontWeight:600, lineHeight:1.3}}>{n.title}</div><div style={{fontSize:11, color:'#888', marginTop:4}}>Fuente: Google News • {catActiva} • Click para leer completa →</div></div>
+                  </a>
+                ))}
             </div>
           </div>
 
@@ -73,15 +72,6 @@ export default function Home() {
                   {catActiva===c ? '● ' : '○ '}{c} {catActiva===c ? '(viendo)' : ''}
                 </button>
               ))}
-            </div>
-            <div style={{background:'black', color:'white', padding:16, borderRadius:8, marginTop:16, fontSize:12, lineHeight:1.5}}>
-              <div style={{color:'#c9a86a', fontWeight:800, marginBottom:6}}>🤖 ROBOT CONFIGURADO</div>
-              Cada botón jala noticias reales de Google News.<br/>
-              El Salvador: noticias nacionales<br/>
-              Internacional: mundo<br/>
-              Economía: economía SV<br/>
-              Política: política SV + USA<br/><br/>
-              Cron: 8am y 8pm hora SV recarga Vercel.
             </div>
           </div>
         </div>
