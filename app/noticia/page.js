@@ -20,9 +20,9 @@ function Contenido() {
         <div style={{marginTop:20, padding:16, background:'#f6fff8', borderLeft:'4px solid #00e676'}}>
           <b>Resumen Taktik:</b> {title}. Nuestro equipo le da seguimiento a esta información desde San Salvador con análisis propio.
         </div>
-        <div style={{background:'#eee', height:90, display:'flex', alignItems:'center', justifyContent:'center', margin:'20px 0', borderRadius:8}}>TU ANUNCIO 1 - ADSENSE</div>
+        <a href="https://wa.me/14694728325?text=Hola%20Taktik%20News%2C%20quiero%20anunciar%20mi%20negocio" target="_blank" style={{display:'block', margin:'20px 0', borderRadius:'12px', overflow:'hidden', border:'3px solid black'}}><img src="/anuncio1.png" style={{width:'100%', display:'block'}} /></a>
         <a href={link} target="_blank" style={{display:'block', background:'black', color:'white', textAlign:'center', padding:'14px', borderRadius:8, textDecoration:'none', fontWeight:700}}>VER NOTA ORIGINAL EN {link ? new URL(link).hostname : ''} ↗</a>
-        <div style={{background:'#eee', height:90, display:'flex', alignItems:'center', justifyContent:'center', margin:'20px 0', borderRadius:8}}>TU ANUNCIO 2 - ADSENSE</div>
+        <a href="https://wa.me/14694728325?text=Hola%20Taktik%20News%2C%20quiero%20anunciar%20mi%20negocio" target="_blank" style={{display:'block', margin:'20px 0', borderRadius:'12px', overflow:'hidden', border:'3px solid black'}}><img src="/anuncio1.png" style={{width:'100%', display:'block'}} /></a>
         <a href="/" style={{display:'block', textAlign:'center', padding:10, color:'#666', textDecoration:'none'}}>← Volver al inicio</a>
       </div>
     </div>
