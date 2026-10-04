@@ -6,12 +6,14 @@ export default function Home() {
   const [noticias, setNoticias] = useState([]);
   const [custom, setCustom] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [bannersAdmin, setBannersAdmin] = useState([]);
   const cats = ['El Salvador', 'Internacional', 'Economía', 'Política'];
 
   useEffect(() => {
     const saved = localStorage.getItem('taktik_custom');
     if(saved) setCustom(JSON.parse(saved));
-
+    const b = localStorage.getItem('taktik_banners');
+    if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} }
     setCargando(true);
     fetch(`/api/noticias?cat=${encodeURIComponent(catActiva)}`)
      .then(r=>r.json()).then(data=>{ setNoticias(data); setCargando(false); });
@@ -77,32 +79,40 @@ export default function Home() {
               <div className="serif" style={{fontSize:13, letterSpacing:2, fontWeight:800, marginBottom:10}}>CATEGORÍAS ACTIVAS</div>
               {cats.map(c=>(<button key={c} onClick={()=>setCatActiva(c)} style={{width:'100%', textAlign:'left', marginTop:8, padding:'12px', background: catActiva===c? 'black' : '#f9f6f0', color: catActiva===c? 'white' : 'black', border:'1px solid #ddd', borderRadius:6, cursor:'pointer', fontWeight:600, fontSize:13}}>{catActiva===c? '● ' : '○ '}{c} {catActiva===c? '(viendo)' : ''}</button>))}
               <a href="/admin" style={{display:'block', marginTop:16, padding:12, background:'#c9a86a', textAlign:'center', fontWeight:800, textDecoration:'none', color:'black', borderRadius:6}}>➕ Subir Noticia Propia</a>
-              {/* ===== 3 ESPACIOS DE ANUNCIOS LED - NO BORRA NADA ===== */}
-<div style={{marginTop:'20px', display:'flex', flexDirection:'column', gap:'16px'}}>
-
-  <div style={{background:'black', borderRadius:'12px', border:'3px solid #FFD700', overflow:'hidden'}}>
-    <div style={{background:'#FFD700', color:'black', fontSize:10, fontWeight:900, padding:'5px', textAlign:'center'}}>🔥 PUBLICIDAD - LED ACTIVO 🔥</div>
-    <div style={{padding:'10px'}}>
-      <div style={{color:'#FFD700', fontSize:11, fontWeight:900, overflow:'hidden', whiteSpace:'nowrap'}}>
-        <div style={{display:'inline-block', animation:'taktikScroll 12s linear infinite'}}> ★ TU PUPUSERIA AQUÍ ★ (469) 472-8325 ★ TU TALLER AQUÍ ★ (469) 472-8325 ★ </div>
-      </div>
-      <a href="https://wa.me/14694728325" target="_blank" style={{display:'block', marginTop:'8px'}}><img src="/anuncio1.png" style={{width:'100%', borderRadius:'8px', display:'block'}} /></a>
-    </div>
-  </div>
-
-  <div style={{background:'white', borderRadius:'12px', border:'3px solid black', padding:'16px', textAlign:'center'}}>
-    <div style={{fontWeight:900}}>¿NEGOCIO EN DALLAS?</div>
-    <div style={{fontSize:11, marginTop:4}}>20,000 salvadoreños te verán aquí</div>
-    <a href="https://wa.me/14694728325" target="_blank" style={{display:'inline-block', marginTop:10, background:'black', color:'white', padding:'8px 16px', borderRadius:6, fontWeight:900, textDecoration:'none', fontSize:12}}>ANÚNCIATE: (469) 472-8325</a>
-  </div>
-
-  <div style={{background:'black', borderRadius:'12px', border:'3px solid #00ff88', padding:'20px', textAlign:'center'}}>
-    <div style={{color:'#00ff88', fontSize:10, fontWeight:900}}>ESPACIO PREMIUM $50/MES</div>
-    <div style={{color:'white', marginTop:10, fontSize:13}}>Tu logo + foto + WhatsApp directo</div>
-  </div>
-
+              {/* ===== 10 BANNERS ENUMERADOS - CONECTADO A /admin ===== */}
+<div style={{marginTop:'20px', display:'flex', flexDirection:'column', gap:'20px'}}>
+  {(() => {
+    let saved = [];
+    try { saved = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem('taktik_banners') || '[]' : '[]'); } catch(e){}
+    return Array.from({length:10}).map((_,i)=>{
+      const num = i+1;
+      const b = saved.find(x=>x.id===num) || {id:num, img:'', link:'https://wa.me/14694728325', led:`BANNER #${num} DISPONIBLE - (469) 472-8325`, activo:true};
+      if(!b.activo) return null;
+      return (
+        <div key={num} style={{background:'black', borderRadius:'12px', border:'3px solid #FFD700', overflow:'hidden'}}>
+          <div style={{background:'#FFD700', color:'black', fontSize:10, fontWeight:900, padding:'6px 10px', display:'flex', justifyContent:'space-between'}}>
+            <span>🔥 BANNER #{num} {num<=3?'▲ ARRIBA':num<=7?'● MEDIO':'▼ ABAJO'}</span>
+            <span style={{background:'black', color:'#FFD700', padding:'2px 6px', borderRadius:4, fontSize:9}}>{b.img?'OCUPADO':'DISPONIBLE'}</span>
+          </div>
+          <div style={{background:'black', color:'#FFD700', fontSize:11, fontWeight:900, padding:'6px', overflow:'hidden', whiteSpace:'nowrap', borderBottom:'1px solid #333'}}>
+            <div style={{display:'inline-block', animation:`taktikScroll${num} 15s linear infinite`}}> ★ {b.led} ★ {b.led} ★ </div>
+          </div>
+          <a href={b.link} target="_blank" style={{display:'block'}}>
+            {b.img ? 
+              <img src={b.img} style={{width:'100%', height:'170px', objectFit:'cover', display:'block'}} /> :
+              <div style={{height:'170px', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', color:'white', padding:'15px', textAlign:'center'}}>
+                <div style={{fontSize:20, fontWeight:900, color:'#FFD700'}}>¡ANÚNCIATE AQUÍ!</div>
+                <div style={{fontSize:11, marginTop:4}}>BANNER #{num}</div>
+                <div style={{marginTop:8, background:'#FFD700', color:'black', padding:'5px 12px', borderRadius:6, fontWeight:900, fontSize:11}}>(469) 472-8325</div>
+              </div>
+            }
+          </a>
+        </div>
+      );
+    });
+  })()}
 </div>
-<style>{`@keyframes taktikScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }`}</style>  
+<style>{`${Array.from({length:10}).map((_,i)=>`@keyframes taktikScroll${i+1} { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }`).join('\n')}`}</style>  
             </div>
           </div>
         </div>
