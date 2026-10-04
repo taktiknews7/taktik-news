@@ -36,7 +36,10 @@ export default function Home() {
           <div style={{maxWidth:1200, margin:'0 auto', padding:'14px 16px', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:10}}>
             <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
   <img src="/logo.png" alt="Taktik News" style={{width:'52px', height:'52px', borderRadius:'50%', background:'white', padding:'2px', objectFit:'cover'}} />
+  <div style={{display:'flex', flexDirection:'column', lineHeight:1}}>
   <div style={{fontSize:28, fontWeight:900, fontFamily:'serif', letterSpacing:'1px'}}>TAKTIK NEWS</div>
+  <div style={{fontSize:11, fontWeight:400, fontStyle:'italic', opacity:0.7, letterSpacing:'1px', marginTop:'2px'}}>Un mundo al Revés</div>
+</div>
 </div>
             <div style={{display:'flex', gap:6}}>{cats.map(c=>(<button key={c} onClick={()=>setCatActiva(c)} style={{background: catActiva===c? '#c9a86a' : '#222', color: catActiva===c? 'black' : 'white', border: catActiva===c? '1px solid #c9a86a' : '1px solid #444', padding:'8px 14px', borderRadius:20, cursor:'pointer', fontWeight:700, fontSize:12}}>{c}</button>))}</div>
           </div>
