@@ -1,8 +1,5 @@
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
-
+"use client";
 import { useState, useEffect } from 'react';
-
 export default function Home() {
   const [catActiva, setCatActiva] = useState('El Salvador');
   const [noticias, setNoticias] = useState([]);
@@ -17,7 +14,7 @@ export default function Home() {
     const b = localStorage.getItem('taktik_banners');
     if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} }
     setCargando(true);
-    fetch(`/api/noticias?cat=${encodeURIComponent(catActiva)}`)
+    fetch(`/api/noticias?cat=${encodeURIComponent(catActiva)}`, { cache: 'no-store' })
      .then(r=>r.json()).then(data=>{ setNoticias(data); setCargando(false); });
   }, [catActiva]);
 
