@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 export default function Admin(){
   const [autorizado, setAutorizado] = useState(false);
+  const [inputPass, setInputPass] = useState("");
   const [passActual, setPassActual] = useState("taktik2025");
   const [nuevoPass, setNuevoPass] = useState("");
 
@@ -17,21 +18,22 @@ export default function Admin(){
   useEffect(()=>{
     const guardado = localStorage.getItem('taktik_password') || 'taktik2025';
     setPassActual(guardado);
-    const input = prompt("🔒 Password Admin Taktik:");
-    if(input === guardado){
-      setAutorizado(true);
-    } else {
-      alert("Password incorrecto");
-      window.location.href = "/";
-      return;
-    }
-
     const b = localStorage.getItem('taktik_banners');
     if(b){ try{ 
       const saved = JSON.parse(b);
       setBanners(prev=> prev.map(p=> saved.find(s=>s.id===p.id) || p));
     }catch(e){} }
   },[]);
+
+  const verificar = () => {
+    const guardado = localStorage.getItem('taktik_password') || 'taktik2025';
+    if(inputPass === guardado){
+      setAutorizado(true);
+    } else {
+      alert("❌ Password incorrecto maitro");
+      setInputPass("");
+    }
+  }
 
   const guardarBanners = (nuevos) => {
     setBanners(nuevos);
@@ -40,7 +42,7 @@ export default function Admin(){
   };
 
   const cambiarPassword = () => {
-    if(nuevoPass.length < 4){ alert("Mínimo 4 caracteres maitro"); return; }
+    if(nuevoPass.length < 4){ alert("Mínimo 4 caracteres"); return; }
     localStorage.setItem('taktik_password', nuevoPass);
     setPassActual(nuevoPass);
     alert(`✅ Password cambiado a: ${nuevoPass}`);
@@ -49,19 +51,35 @@ export default function Admin(){
 
   const bannerActual = banners.find(b=>b.id===bannerEditando);
 
-  if(!autorizado) return <div style={{padding:20}}>Verificando...</div>;
+  if(!autorizado){
+    return (
+      <div style={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100vh', background:'black'}}>
+        <h2 style={{color:'#FFD700'}}>🔒 Admin Taktik News</h2>
+        <input 
+          type="password" 
+          placeholder="Password" 
+          value={inputPass} 
+          onChange={e=>setInputPass(e.target.value)}
+          onKeyDown={e=> e.key==='Enter' && verificar()}
+          style={{padding:12, width:250, borderRadius:8, border:'2px solid #FFD700', textAlign:'center'}}
+          autoFocus
+        />
+        <button onClick={verificar} style={{marginTop:10, padding:'10px 30px', background:'#FFD700', fontWeight:900, borderRadius:8}}>ENTRAR</button>
+      </div>
+    )
+  }
 
   return (
     <div style={{padding:20, maxWidth:900, margin:'0 auto', fontFamily:'serif'}}>
       <h1>📝 Panel Taktik News</h1>
 
-      {/* ESTO ES LO UNICO NUEVO - CAMBIO DE PASSWORD */}
       <div style={{background:'#fff3cd', padding:12, border:'2px solid #c9a86a', borderRadius:8, marginBottom:20}}>
         <b>🔑 Password Actual: {passActual}</b>
         <div style={{display:'flex', gap:8, marginTop:8}}>
           <input type="text" placeholder="Nuevo password" value={nuevoPass} onChange={e=>setNuevoPass(e.target.value)} style={{flex:1, padding:8}} />
           <button onClick={cambiarPassword} style={{padding:'8px 12px', background:'black', color:'white', fontWeight:900, borderRadius:6}}>Cambiar</button>
         </div>
+        <button onClick={()=>{setAutorizado(false); setInputPass("");}} style={{marginTop:8, fontSize:11}}>Cerrar sesión</button>
       </div>
 
       <div style={{display:'flex', gap:10, marginBottom:20}}>
@@ -94,37 +112,19 @@ export default function Admin(){
               </button>
             ))}
           </div>
-
           <div style={{background:'white', padding:15, borderRadius:8}}>
-            <h4 style={{margin:'0 0 10px 0'}}>Editando BANNER #{bannerEditando} - {bannerEditando<=3?'▲ ARRIBA':bannerEditando<=7?'● MEDIO':'▼ ABAJO'}</h4>
-            <label style={{fontSize:12, fontWeight:800}}>Link Imagen (del anuncio):</label>
-            <input value={bannerActual?.img||''} onChange={e=>{
-              const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, img:e.target.value} : x);
-              setBanners(nuevos);
-            }} placeholder="https://..." style={{width:'100%', padding:8, marginBottom:10}} />
-
-            <label style={{fontSize:12, fontWeight:800}}>Link destino (WhatsApp o web del cliente):</label>
-            <input value={bannerActual?.link||''} onChange={e=>{
-              const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, link:e.target.value} : x);
-              setBanners(nuevos);
-            }} placeholder="https://wa.me/..." style={{width:'100%', padding:8, marginBottom:10}} />
-
-            <label style={{fontSize:12, fontWeight:800}}>Texto LED amarillo (se mueve):</label>
-            <input value={bannerActual?.led||''} onChange={e=>{
-              const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, led:e.target.value} : x);
-              setBanners(nuevos);
-            }} style={{width:'100%', padding:8, marginBottom:10}} />
-
-            <label style={{display:'flex', gap:8, alignItems:'center', marginBottom:12}}><input type="checkbox" checked={bannerActual?.activo} onChange={e=>{
-              const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, activo:e.target.checked} : x);
-              setBanners(nuevos);
-            }} /> Activo</label>
-
+            <h4 style={{margin:'0 0 10px 0'}}>Editando BANNER #{bannerEditando}</h4>
+            <label style={{fontSize:12, fontWeight:800}}>Link Imagen:</label>
+            <input value={bannerActual?.img||''} onChange={e=>{ const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, img:e.target.value} : x); setBanners(nuevos); }} placeholder="https://..." style={{width:'100%', padding:8, marginBottom:10}} />
+            <label style={{fontSize:12, fontWeight:800}}>Link destino:</label>
+            <input value={bannerActual?.link||''} onChange={e=>{ const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, link:e.target.value} : x); setBanners(nuevos); }} placeholder="https://wa.me/..." style={{width:'100%', padding:8, marginBottom:10}} />
+            <label style={{fontSize:12, fontWeight:800}}>Texto LED:</label>
+            <input value={bannerActual?.led||''} onChange={e=>{ const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, led:e.target.value} : x); setBanners(nuevos); }} style={{width:'100%', padding:8, marginBottom:10}} />
+            <label style={{display:'flex', gap:8, alignItems:'center', marginBottom:12}}><input type="checkbox" checked={bannerActual?.activo} onChange={e=>{ const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, activo:e.target.checked} : x); setBanners(nuevos); }} /> Activo</label>
             <button onClick={()=>guardarBanners(banners)} style={{width:'100%', padding:12, background:'#FFD700', color:'black', fontWeight:900, borderRadius:8, border:'2px solid black'}}>💾 GUARDAR BANNER #{bannerEditando}</button>
-            
             {bannerActual?.img && <div style={{marginTop:15}}><p style={{fontSize:12}}>Vista previa:</p><img src={bannerActual.img} style={{width:'100%', maxHeight:150, objectFit:'cover', border:'1px solid #ddd'}} /></div>}
           </div>
-          <button onClick={()=>guardarBanners(banners)} style={{marginTop:10, width:'100%', padding:10, background:'#222', color:'#FFD700', border:'1px solid #FFD700', borderRadius:8}}>💾 GUARDAR TODOS LOS BANNERS</button>
+          <button onClick={()=>guardarBanners(banners)} style={{marginTop:10, width:'100%', padding:10, background:'#222', color:'#FFD700', border:'1px solid #FFD700', borderRadius:8}}>💾 GUARDAR TODOS</button>
         </div>
       )}
     </div>
