@@ -2,7 +2,11 @@
 import { useState, useEffect } from 'react';
 
 export default function Admin(){
-  const [tab, setTab] = useState('noticia'); // noticia | banners
+  const [autorizado, setAutorizado] = useState(false);
+  const [passActual, setPassActual] = useState("taktik2025");
+  const [nuevoPass, setNuevoPass] = useState("");
+
+  const [tab, setTab] = useState('noticia');
   const [banners, setBanners] = useState(Array.from({length:10}).map((_,i)=>({id:i+1, img:'', link:'https://wa.me/14694728325', led:`BANNER #${i+1} DISPONIBLE - (469) 472-8325`, activo:true})));
   const [bannerEditando, setBannerEditando] = useState(1);
   const [titulo, setTitulo] = useState('');
@@ -11,10 +15,20 @@ export default function Admin(){
   const [contenido, setContenido] = useState('');
 
   useEffect(()=>{
+    const guardado = localStorage.getItem('taktik_password') || 'taktik2025';
+    setPassActual(guardado);
+    const input = prompt("🔒 Password Admin Taktik:");
+    if(input === guardado){
+      setAutorizado(true);
+    } else {
+      alert("Password incorrecto");
+      window.location.href = "/";
+      return;
+    }
+
     const b = localStorage.getItem('taktik_banners');
     if(b){ try{ 
       const saved = JSON.parse(b);
-      // Mezclar guardados con defaults
       setBanners(prev=> prev.map(p=> saved.find(s=>s.id===p.id) || p));
     }catch(e){} }
   },[]);
@@ -25,11 +39,30 @@ export default function Admin(){
     alert('✅ Banner guardado! Ahora recarga la página principal');
   };
 
+  const cambiarPassword = () => {
+    if(nuevoPass.length < 4){ alert("Mínimo 4 caracteres maitro"); return; }
+    localStorage.setItem('taktik_password', nuevoPass);
+    setPassActual(nuevoPass);
+    alert(`✅ Password cambiado a: ${nuevoPass}`);
+    setNuevoPass("");
+  }
+
   const bannerActual = banners.find(b=>b.id===bannerEditando);
+
+  if(!autorizado) return <div style={{padding:20}}>Verificando...</div>;
 
   return (
     <div style={{padding:20, maxWidth:900, margin:'0 auto', fontFamily:'serif'}}>
       <h1>📝 Panel Taktik News</h1>
+
+      {/* ESTO ES LO UNICO NUEVO - CAMBIO DE PASSWORD */}
+      <div style={{background:'#fff3cd', padding:12, border:'2px solid #c9a86a', borderRadius:8, marginBottom:20}}>
+        <b>🔑 Password Actual: {passActual}</b>
+        <div style={{display:'flex', gap:8, marginTop:8}}>
+          <input type="text" placeholder="Nuevo password" value={nuevoPass} onChange={e=>setNuevoPass(e.target.value)} style={{flex:1, padding:8}} />
+          <button onClick={cambiarPassword} style={{padding:'8px 12px', background:'black', color:'white', fontWeight:900, borderRadius:6}}>Cambiar</button>
+        </div>
+      </div>
 
       <div style={{display:'flex', gap:10, marginBottom:20}}>
         <button onClick={()=>setTab('noticia')} style={{padding:'10px 20px', background:tab==='noticia'?'#c9a86a':'white', fontWeight:900, border:'2px solid black', borderRadius:8}}>📰 PUBLICAR NOTICIA</button>
