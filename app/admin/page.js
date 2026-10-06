@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 export default function Admin(){
   const [autorizado, setAutorizado] = useState(false);
   const [inputPass, setInputPass] = useState("");
+  const [verPass, setVerPass] = useState(false);
   const [passActual, setPassActual] = useState("taktik2025");
   const [nuevoPass, setNuevoPass] = useState("");
 
@@ -55,16 +56,26 @@ export default function Admin(){
     return (
       <div style={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100vh', background:'black'}}>
         <h2 style={{color:'#FFD700'}}>🔒 Admin Taktik News</h2>
-        <input 
-          type="password" 
-          placeholder="Password" 
-          value={inputPass} 
-          onChange={e=>setInputPass(e.target.value)}
-          onKeyDown={e=> e.key==='Enter' && verificar()}
-          style={{padding:12, width:250, borderRadius:8, border:'2px solid #FFD700', textAlign:'center'}}
-          autoFocus
-        />
-        <button onClick={verificar} style={{marginTop:10, padding:'10px 30px', background:'#FFD700', fontWeight:900, borderRadius:8}}>ENTRAR</button>
+        
+        <div style={{position:'relative', width:280}}>
+          <input 
+            type={verPass ? "text" : "password"}
+            placeholder="Password" 
+            value={inputPass} 
+            onChange={e=>setInputPass(e.target.value)}
+            onKeyDown={e=> e.key==='Enter' && verificar()}
+            style={{padding:12, width:'100%', borderRadius:8, border:'2px solid #FFD700', textAlign:'center', paddingRight:40}}
+            autoFocus
+          />
+          <span 
+            onClick={()=>setVerPass(!verPass)}
+            style={{position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', cursor:'pointer', fontSize:20}}
+          >
+            {verPass ? '🙈' : '👁️'}
+          </span>
+        </div>
+
+        <button onClick={verificar} style={{marginTop:12, padding:'10px 30px', background:'#FFD700', fontWeight:900, borderRadius:8}}>ENTRAR</button>
       </div>
     )
   }
@@ -72,7 +83,6 @@ export default function Admin(){
   return (
     <div style={{padding:20, maxWidth:900, margin:'0 auto', fontFamily:'serif'}}>
       <h1>📝 Panel Taktik News</h1>
-
       <div style={{background:'#fff3cd', padding:12, border:'2px solid #c9a86a', borderRadius:8, marginBottom:20}}>
         <b>🔑 Password Actual: {passActual}</b>
         <div style={{display:'flex', gap:8, marginTop:8}}>
@@ -81,12 +91,10 @@ export default function Admin(){
         </div>
         <button onClick={()=>{setAutorizado(false); setInputPass("");}} style={{marginTop:8, fontSize:11}}>Cerrar sesión</button>
       </div>
-
       <div style={{display:'flex', gap:10, marginBottom:20}}>
         <button onClick={()=>setTab('noticia')} style={{padding:'10px 20px', background:tab==='noticia'?'#c9a86a':'white', fontWeight:900, border:'2px solid black', borderRadius:8}}>📰 PUBLICAR NOTICIA</button>
         <button onClick={()=>setTab('banners')} style={{padding:'10px 20px', background:tab==='banners'?'#FFD700':'white', fontWeight:900, border:'2px solid black', borderRadius:8}}>🔥 BANNERS #1 al #10 - PUBLICIDAD</button>
       </div>
-
       {tab==='noticia' ? (
         <div style={{background:'#fffaf0', padding:15, border:'1px solid #ddd', borderRadius:8}}>
           <input placeholder="Título" value={titulo} onChange={e=>setTitulo(e.target.value)} style={{width:'100%', padding:10, marginBottom:10}} />
