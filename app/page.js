@@ -8,9 +8,10 @@ export default function Home() {
   const [custom, setCustom] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [bannersAdmin, setBannersAdmin] = useState([]);
+  const [fechaHoy, setFechaHoy] = useState('');
   const cats = ['El Salvador', 'Internacional', 'Economía', 'Política'];
 
-  useEffect(() => {
+  useEffect(() => {    setFechaHoy(new Date().toLocaleDateString('es-SV', {weekday:'long', day:'numeric', month:'long'}) + ' - ROBOT ACTIVO ✅');
     const saved = localStorage.getItem('taktik_custom');
     if(saved) setCustom(JSON.parse(saved));
     const b = localStorage.getItem('taktik_banners');
@@ -47,7 +48,7 @@ export default function Home() {
             <div style={{display:'flex', gap:6}}>{cats.map(c=>(<button key={c} onClick={()=>setCatActiva(c)} style={{background: catActiva===c? '#c9a86a' : '#222', color: catActiva===c? 'black' : 'white', border: catActiva===c? '1px solid #c9a86a' : '1px solid #444', padding:'8px 14px', borderRadius:20, cursor:'pointer', fontWeight:700, fontSize:12}}>{c}</button>))}</div>
           </div>
           <div style={{maxWidth:1200, margin:'0 auto', padding:'6px 16px', fontSize:11, opacity:0.7, display:'flex', justifyContent:'space-between', borderTop:'1px solid #222'}}>
-            <span>{new Date().toLocaleDateString('es-SV', {weekday:'long', day:'numeric', month:'long'})} - ROBOT ACTIVO ✅</span>
+            <span>{fechaHoy}</span>
             <span>{cargando? 'Buscando...' : `${todas.length} noticias de ${catActiva}`} <a href="/admin" style={{color:'#c9a86a', marginLeft:10}}>⚙️ Admin</a></span>
           </div>
         </header>
