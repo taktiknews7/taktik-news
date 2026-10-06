@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from 'react';
+
 export default function Home() {
   const [catActiva, setCatActiva] = useState('El Salvador');
   const [noticias, setNoticias] = useState([]);
+  // ... lo demás igual
   const [custom, setCustom] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [bannersAdmin, setBannersAdmin] = useState([]);
