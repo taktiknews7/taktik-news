@@ -17,7 +17,7 @@ export default function Home() {
     const b = localStorage.getItem('taktik_banners');
     if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} }
     setCargando(true);
-    fetch(`/api/noticias?cat=${encodeURIComponent(catActiva)}`, { cache: 'no-store' })
+    fetch(`/api/noticias?cat=${encodeURIComponent(catActiva)}&t=${Date.now()}`
      .then(r=>r.json()).then(data=>{ setNoticias(data); setCargando(false); });
   }, [catActiva]);
 
