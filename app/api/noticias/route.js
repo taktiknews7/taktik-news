@@ -24,7 +24,7 @@ export async function GET(req) {
       t = t.replace(/<!\[CDATA\[|\]\]>/g,'').split(' - ')[0];
       let l = b.match(/<link>(.*?)<\/link>/)?.[1] || '#';
       return { title: t.trim(), link: l, img: FOTO };
-    }).filter(x=>x.title.length>15).slice(0,15);
+      ).filter(x=>x.title.length>15).slice(0,26);
 
     if(items.length>1) return Response.json(items);
     throw new Error('pocos');
