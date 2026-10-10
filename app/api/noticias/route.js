@@ -1,49 +1,57 @@
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+const IMG_POR_CAT = {
+  'El Salvador': 'https://images.unsplash.com/photo-1544985361-b420d7a77043?w=900', // centro historico
+  'Internacional': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=900',
+  'Economía': 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=900',
+  'Política': 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=900'
+};
+
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const cat = searchParams.get('cat') || 'El Salvador';
 
-  // FUENTES DIRECTAS QUE SI TRAEN FOTO
-  const feeds = {
-    'El Salvador': [
-      'https://www.laprensagrafica.com/rss/nacion.xml',
-      'https://www.elsalvador.com/rss/elsalvador.xml'
-    ],
-    'Internacional': ['https://feeds.bbci.co.uk/mundo/rss.xml'],
-    'Economía': ['https://www.laprensagrafica.com/rss/economia.xml'],
-    'Política': ['https://www.laprensagrafica.com/rss/nacion.xml']
-  };
+  let query = 'El Salvador';
+  if (cat === 'Internacional') query = 'mundo';
+  if (cat === 'Economía' || cat === 'Economia') query = 'economia El Salvador';
+  if (cat === 'Política' || cat === 'Politica') query = 'politica El Salvador';
 
-  const urls = feeds[cat] || feeds['El Salvador'];
-  let todas = [];
+  try {
+    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=es-419&gl=SV&ceid=SV:es-419`;
+    // Usamos rss2json que SI funciona en Vercel y nos da la foto
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
 
-  for (const feedUrl of urls) {
-    try {
-      const res = await fetch(feedUrl, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(4000) });
-      const xml = await res.text();
-      const items = [...xml.matchAll(/<item>(.*?)<\/item>/gs)].slice(0, 10).map(m => {
-        const b = m[1];
-        const title = (b.match(/<title>(.*?)<\/title>/)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g,'').replace(/<[^>]+>/g,'');
-        const link = (b.match(/<link>(.*?)<\/link>/)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g,'');
-        // ESTA ES LA CLAVE: La foto viene en el RSS
-        let img = b.match(/<enclosure url="([^"]+)"/)?.[1]
-               || b.match(/<media:content[^>]+url="([^"]+)"/)?.[1]
-               || b.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1]
-               || (b.match(/<description>.*?<img[^>]+src="([^"]+)"/s)?.[1]);
+    const res = await fetch(apiUrl, { cache: 'no-store' });
+    const data = await res.json();
 
-        if(img) img = img.replace(/<!\[CDATA\[|\]\]>/g,'').trim();
-        return { title, link, img };
-      });
-      todas.push(...items);
-    } catch(e){}
+    if (!data.items) throw new Error('sin items');
+
+    const items = data.items.slice(0, 12).map(item => {
+      // rss2json a veces trae imagen en enclosure o description
+      let img = item.enclosure?.link || null;
+      if (!img) {
+        const m = item.description?.match(/<img[^>]+src="([^"]+)"/);
+        if (m) img = m[1];
+      }
+      // Si no hay foto, usa una bonita de El Salvador, no el futbolista
+      if (!img || img.includes('news.google.com')) {
+        img = IMG_POR_CAT[cat] || IMG_POR_CAT['El Salvador'];
+      }
+
+      return {
+        title: item.title,
+        link: item.link,
+        img: img
+      };
+    }).filter(n => n.title.length > 20);
+
+    return Response.json(items);
+  } catch (e) {
+    console.log("Error robot:", e);
+    // Si todo falla, al menos no mostramos el futbolista, mostramos una de ES
+    return Response.json([
+      { title: `Noticias de ${cat} - Taktik News en vivo ${new Date().toLocaleDateString('es-SV')}`, link: '#', img: IMG_POR_CAT[cat] }
+    ]);
   }
-
-  // Si por algo falla, usamos Google como respaldo pero SIN imagen (usa la de categoria)
-  if(todas.length === 0){
-    return Response.json([{title: "Taktik News - Actualizando...", link:"#", img:null}]);
-  }
-
-  return Response.json(todas.slice(0, 15));
 }
