@@ -26,7 +26,7 @@ export default function Home() {
   const principal = todas[0];
 
   const imgCat = {
-    'El Salvador': 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=900',
+    'El Salvador': 'https://images.unsplash.com/photo-1544985361-b420d7a77043?w=900',
     'Internacional': 'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=900',
     'Economía': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900',
     'Política': 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=900'
