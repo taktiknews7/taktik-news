@@ -11,14 +11,14 @@ export default function Home() {
   const [fechaHoy, setFechaHoy] = useState('');
   const cats = ['El Salvador', 'Internacional', 'Economía', 'Política'];
 
-  useEffect(() => {    setFechaHoy(new Date().toLocaleDateString('es-SV', {weekday:'long', day:'numeric', month:'long'}) + ' - ROBOT ACTIVO ✅');
+    useEffect(() => {   setFechaHoy(new Date().toLocaleDateString('es-SV', {weekday:'long', day:'numeric', month:'long'}) + ' - ROBOT ACTIVO ✅');
     const saved = localStorage.getItem('taktik_custom');
     if(saved) setCustom(JSON.parse(saved));
     const b = localStorage.getItem('taktik_banners');
     if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} }
     setCargando(true);
-    fetch(`/api/noticias?cat=${encodeURIComponent(catActiva)}&t=${Date.now()}`
-     .then(r=>r.json()).then(data=>{ setNoticias(data); setCargando(false); });
+    fetch(`/api/noticias?cat=${encodeURIComponent(catActiva)}&t=${Date.now()}`)
+    .then(r=>r.json()).then(data=>{ setNoticias(data); setCargando(false); });
   }, [catActiva]);
 
   const customFiltradas = custom.filter(c=>c.cat===catActiva);
