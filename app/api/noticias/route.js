@@ -1,34 +1,55 @@
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export async function GET() {
-  const FOTO = 'https://images.unsplash.com/photo-1544985361-b420d7a77043?w=900';
-  const data = [
-    { title: "Asamblea Legislativa discute reformas clave hoy", link: "#", img: FOTO },
-    { title: "Clima en El Salvador: pronóstico para hoy sábado", link: "#", img: FOTO },
-    { title: "Economía salvadoreña muestra crecimiento según BCR", link: "#", img: FOTO },
-    { title: "Selección de El Salvador prepara próximos partidos FIFA", link: "#", img: FOTO },
-    { title: "Obras en Centro Histórico de San Salvador avanzan 80%", link: "#", img: FOTO },
-    { title: "Seguridad: PNC reporta capturas en operativo nacional", link: "#", img: FOTO },
-    { title: "Turismo en El Salvador aumenta este fin de semana", link: "#", img: FOTO },
-    { title: "Precio del Bitcoin hoy - actualización El Salvador", link: "#", img: FOTO },
-    { title: "Salud: MINSAL brinda recomendaciones por lluvias", link: "#", img: FOTO },
-    { title: "Internacional: últimas noticias del mundo hoy", link: "#", img: FOTO },
-    { title: "Política: reacciones tras anuncios del gobierno", link: "#", img: FOTO },
-    { title: "Transporte colectivo: cambios en rutas de San Salvador", link: "#", img: FOTO },
-    { title: "Estados Unidos canaliza $55 millones como apoyo por sequía", link: "#", img: FOTO },
-    { title: "La niñez, el primer eslabón del proceso educativo en El Salvador", link: "#", img: FOTO },
-    { title: "Congresistas piden extensión del TPS en Capitolio Washington", link: "#", img: FOTO },
-    { title: "Remesas familiares aumentan 8% en El Salvador este mes", link: "#", img: FOTO },
-    { title: "Alcaldía de San Salvador anuncia nuevo mercado central", link: "#", img: FOTO },
-    { title: "FOVIAL inicia bacheo en carretera Panamericana", link: "#", img: FOTO },
-    { title: "Jóvenes salvadoreños ganan beca internacional", link: "#", img: FOTO },
-    { title: "Precio de la canasta básica se mantiene estable", link: "#", img: FOTO },
-    { title: "Puerto de La Unión registra movimiento récord", link: "#", img: FOTO },
-    { title: "INJUVE lanza nuevo programa de empleo juvenil", link: "#", img: FOTO },
-    { title: "Carnaval de San Miguel: preparativos a todo vapor", link: "#", img: FOTO },
-    { title: "Exportaciones salvadoreñas crecen 12% según informe", link: "#", img: FOTO },
-    { title: "Migración: consulado ayuda a salvadoreños en Washington", link: "#", img: FOTO },
-    { title: "Agricultura: cosecha de café con buenos resultados", link: "#", img: FOTO },
-  ];
-  return Response.json(data);
+import { NextResponse } from 'next/server';
+import Parser from 'rss-parser';
+const parser = new Parser();
+
+const RSS = {
+  'El Salvador': 'https://news.google.com/rss/search?q=El+Salvador&hl=es-419&gl=SV&ceid=SV:es-419',
+  'Internacional': 'https://news.google.com/rss/search?q=Internacional&hl=es-419&gl=SV&ceid=SV:es-419',
+  'Economía': 'https://news.google.com/rss/search?q=Economia+El+Salvador&hl=es-419&gl=SV&ceid=SV:es-419',
+  'Política': 'https://news.google.com/rss/search?q=Politica+El+Salvador&hl=es-419&gl=SV&ceid=SV:es-419'
+};
+
+// Imagenes reales que NO bloquean, rotan cada 24h
+const IMAGENES_REALES = {
+  'El Salvador': [
+    'https://images.unsplash.com/photo-1518638150340-f706e86654b8?w=900',
+    'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=900',
+    'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=900'
+  ],
+  'Internacional': [
+    'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900',
+    'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=900'
+  ],
+  'Economía': [
+    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900',
+    'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=900'
+  ],
+  'Política': [
+    'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=900',
+    'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=900'
+  ]
+};
+
+function getImagen24h(cat){
+  const dia = Math.floor(Date.now() / (1000 * 60 * 60 * 24)); // cambia cada 24h
+  const lista = IMAGENES_REALES[cat] || IMAGENES_REALES['El Salvador'];
+  return lista[dia % lista.length];
+}
+
+export async function GET(req){
+  const { searchParams } = new URL(req.url);
+  const cat = searchParams.get('cat') || 'El Salvador';
+  try{
+    const feed = await parser.parseURL(RSS[cat] || RSS['El Salvador']);
+    const noticias = feed.items.slice(0,26).map((item, idx)=>({
+      title: item.title,
+      link: item.link,
+      // Si es la principal (idx 0), le ponemos imagen real que rota cada 24h
+      img: idx === 0? getImagen24h(cat) : null,
+      fecha: new Date().toLocaleDateString('es-SV')
+    }));
+    return NextResponse.json(noticias);
+  }catch(e){
+    return NextResponse.json([]);
+  }
 }
