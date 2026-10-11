@@ -11,14 +11,14 @@ export default function Home() {
   const cats = ['El Salvador', 'Internacional', 'Economía', 'Política'];
 
   useEffect(() => {
-    setFechaHoy(new Date().toLocaleDateString('es-SV', {weekday:'long', day:'numeric', month:'long'}) + ' - ROBOT ACTIVO ✅');
+    setFechaHoy(new Date().toLocaleDateString('es-SV', {weekday:'long', day:'numeric', month:'long'}) + ' - ROBOT BBC+INFOBAE ACTIVO ✅');
     const saved = localStorage.getItem('taktik_custom');
     if(saved) setCustom(JSON.parse(saved));
     const b = localStorage.getItem('taktik_banners');
     if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} }
     setCargando(true);
     fetch("/api/noticias?cat=" + encodeURIComponent(catActiva) + "&t=" + Date.now())
- .then(r=>r.json()).then(data=>{ setNoticias(data); setCargando(false); });
+    .then(r=>r.json()).then(data=>{ setNoticias(data); setCargando(false); });
   }, [catActiva]);
 
   const customFiltradas = custom.filter(c=>c.cat===catActiva);
@@ -27,7 +27,7 @@ export default function Home() {
   const listaCorta = todas.slice(1, 11);
   const listaLarga = todas.slice(11, 26);
 
-      const imgCat = {
+  const imgCat = {
     'El Salvador': 'https://images.unsplash.com/photo-1518638150340-f706e86654b8?w=900',
     'Internacional': 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900',
     'Economía': 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=900',
@@ -60,35 +60,36 @@ export default function Home() {
             {principal && (
               <div>
                 <span style={{background: customFiltradas.length>0 && principal.id? '#b30000' : '#c9a86a', color: customFiltradas.length>0 && principal.id? 'white' : 'black', padding:'4px 10px', fontSize:10, fontWeight:800}}>{customFiltradas.length>0 && principal.id? '🔥 EXCLUSIVA TAKTIK' : catActiva.toUpperCase() + ' • EN VIVO'}</span>
-                <a href={principal.id? "/noticia?title=" + encodeURIComponent(principal.title) + "&cat=" + encodeURIComponent(principal.cat) + "&custom=" + principal.id : "/noticia?title=" + encodeURIComponent(principal.title) + "&cat=" + encodeURIComponent(catActiva)} style={{textDecoration:'none', color:'black'}}>
+                <a href={principal.id? "/noticia?title=" + encodeURIComponent(principal.title) + "&cat=" + encodeURIComponent(principal.cat) + "&custom=" + principal.id : "/noticia?title=" + encodeURIComponent(principal.title) + "&link=" + encodeURIComponent(principal.link) + "&cat=" + encodeURIComponent(catActiva)} style={{textDecoration:'none', color:'black'}}>
                   <h1 className="serif" style={{fontSize:34, lineHeight:1.1, marginTop:10}}>{principal.title}</h1>
+                  <p style={{fontSize:13, color:'#555'}}>{principal.desc}</p>
                   <img src={principal.img || imgCat[catActiva]} alt="principal" style={{width:'100%', height:360, objectFit:'cover', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} />
                 </a>
               </div>
             )}
 
             <div style={{marginTop:24, background:'white', border:'1px solid #e5e5e5', borderRadius:8, overflow:'hidden'}}>
-              <div style={{padding:'12px 16px', fontWeight:800, fontSize:13, borderBottom:'2px solid black', display:'flex', justifyContent:'space-between'}}><span>📰 NOTICIAS DE {catActiva.toUpperCase()} {customFiltradas.length>0? "+ " + customFiltradas.length + " PROPIAS" : '- ROBOT GOOGLE'}</span><span style={{fontSize:10, background:'black', color:'white', padding:'2px 6px', borderRadius:4}}>AUTO</span></div>
+              <div style={{padding:'12px 16px', fontWeight:800, fontSize:13, borderBottom:'2px solid black', display:'flex', justifyContent:'space-between'}}><span>📰 NOTICIAS DE {catActiva.toUpperCase()} {customFiltradas.length>0? "+ " + customFiltradas.length + " PROPIAS" : '- ROBOT BBC+INFOBAE'}</span><span style={{fontSize:10, background:'black', color:'white', padding:'2px 6px', borderRadius:4}}>AUTO</span></div>
               {cargando? <div style={{padding:20}}>⏳ El robot está buscando...</div> :
                 listaCorta.map((n,i)=>(
                   <a key={i} href={n.id? "/noticia?title=" + encodeURIComponent(n.title) + "&cat=" + encodeURIComponent(n.cat) + "&custom=" + n.id : "/noticia?title=" + encodeURIComponent(n.title) + "&link=" + encodeURIComponent(n.link) + "&cat=" + encodeURIComponent(catActiva)} style={{display:'flex', gap:12, padding:'14px 16px', borderBottom:'1px solid #f0f0f0', textDecoration:'none', color:'black', background: n.id? '#fff8e7' : 'white'}}>
                     <div style={{minWidth:44, height:44, background: n.id? '#b30000' : catActiva==='El Salvador'? '#00205b' : '#0a5c36', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:900, borderRadius:6, fontSize:12}}>{n.id? '★' : i+2}</div>
-                    <div><div style={{fontSize:14, fontWeight:600, lineHeight:1.3}}>{n.title} {n.id && <span style={{background:'#b30000', color:'white', fontSize:9, padding:'2px 5px', borderRadius:3, marginLeft:6}}>PROPIA</span>}</div><div style={{fontSize:11, color:'#888', marginTop:4}}>{n.id? "Redacción Taktik • " + n.fecha : "Fuente: Google News • " + catActiva} • Click →</div></div>
+                    <div><div style={{fontSize:14, fontWeight:600, lineHeight:1.3}}>{n.title} {n.id && <span style={{background:'#b30000', color:'white', fontSize:9, padding:'2px 5px', borderRadius:3, marginLeft:6}}>PROPIA</span>}</div><div style={{fontSize:11, color:'#888', marginTop:4}}>{n.id? "Redacción Taktik • " + n.fecha : "Fuente: " + (n.link?.includes('bbc')?'BBC':'Infobae') + " • " + catActiva} • Click →</div></div>
                   </a>
                 ))}
             </div>
 
-            {listaLarga.length > 0 && (
-              <div style={{marginTop:20, background:'white', border:'1px solid #e5e5e5', borderRadius:8, overflow:'hidden'}}>
-                <div style={{padding:'10px 16px', fontWeight:900, fontSize:12, background:'black', color:'#FFD700', letterSpacing:1}}>🔥 MAS TITULARES - PARA LLENAR EL HUECO</div>
-                {listaLarga.map((n,i)=>(
+            {/* ESTE ES EL QUE TE TAPA EL HUECO */}
+            <div style={{marginTop:20, background:'white', border:'1px solid #e5e5e5', borderRadius:8, overflow:'hidden'}}>
+              <div style={{padding:'10px 16px', fontWeight:900, fontSize:12, background:'black', color:'#FFD700', letterSpacing:1}}>🔥 MÁS TITULARES - {listaLarga.length} EXTRAS PARA LLENAR EL HUECO</div>
+              {listaLarga.length===0? <div style={{padding:16, fontSize:13}}>Cargando 15 titulares extra para llenar hueco...</div> :
+                listaLarga.map((n,i)=>(
                   <a key={i} href={n.id? "/noticia?title=" + encodeURIComponent(n.title) + "&cat=" + encodeURIComponent(n.cat) + "&custom=" + n.id : "/noticia?title=" + encodeURIComponent(n.title) + "&link=" + encodeURIComponent(n.link) + "&cat=" + encodeURIComponent(catActiva)} style={{display:'flex', gap:10, padding:'10px 16px', borderBottom:'1px solid #f0f0f0', textDecoration:'none', color:'#111', fontSize:13, lineHeight:1.3}}>
                     <span style={{background:'#000', color:'#FFD700', minWidth:22, height:22, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:4, fontSize:10, fontWeight:900}}>{i+12}</span>
                     <span style={{fontWeight:600}}>{n.title}</span>
                   </a>
                 ))}
-              </div>
-            )}
+            </div>
           </div>
 
           <div>
