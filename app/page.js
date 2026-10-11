@@ -18,7 +18,7 @@ export default function Home() {
     if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} }
     setCargando(true);
     fetch(`/api/noticias?cat=${encodeURIComponent(catActiva)}&t=${Date.now()}`)
-   .then(r=>r.json()).then(data=>{ setNoticias(data); setCargando(false); });
+  .then(r=>r.json()).then(data=>{ setNoticias(data); setCargando(false); });
   }, [catActiva]);
 
   const customFiltradas = custom.filter(c=>c.cat===catActiva);
@@ -26,12 +26,13 @@ export default function Home() {
   const principal = todas[0];
   const listaCorta = todas.slice(1, 11);
   const listaLarga = todas.slice(11, 26);
+
   const imgCat = {
     'El Salvador': 'https://images.unsplash.com/photo-1544985361-b420d7a77043?w=900',
     'Internacional': 'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=900',
     'Economía': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900',
     'Política': 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=900'
-  }
+  };
 
   return (
     <>
@@ -57,12 +58,14 @@ export default function Home() {
         <div style={{maxWidth:1200, margin:'0 auto', padding:20, display:'grid', gridTemplateColumns:'1.7fr 0.8fr', gap:28}}>
           <div>
             {principal && (
-              <>
+              <div>
                 <span style={{background: customFiltradas.length>0 && principal.id? '#b30000' : '#c9a86a', color: customFiltradas.length>0 && principal.id? 'white' : 'black', padding:'4px 10px', fontSize:10, fontWeight:800}}>{customFiltradas.length>0 && principal.id? '🔥 EXCLUSIVA TAKTIK' : `${catActiva.toUpperCase()} • EN VIVO`}</span>
-                        <a href={principal.id? `/noticia?title=${encodeURIComponent(principal.title)}&cat=${encodeURIComponent(principal.cat)}&custom=${principal.id}` : `/noticia?title=${encodeURIComponent(principal.title)}&cat=${encodeURIComponent(catActiva)}`}>
-          <h1 className="serif" style={{fontSize:34, lineHeight:1.1, marginTop:10}}>{principal.title}</h1>
-          <img src={imgCat[catActiva]} style={{width:'100%', height:360, objectFit:'cover', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} />
-        </a>
+                <a href={principal.id? `/noticia?title=${encodeURIComponent(principal.title)}&cat=${encodeURIComponent(principal.cat)}&custom=${principal.id}` : `/noticia?title=${encodeURIComponent(principal.title)}&cat=${encodeURIComponent(catActiva)}`} style={{textDecoration:'none', color:'black'}}>
+                  <h1 className="serif" style={{fontSize:34, lineHeight:1.1, marginTop:10}}>{principal.title}</h1>
+                  <img src={imgCat[catActiva]} alt="principal" style={{width:'100%', height:360, objectFit:'cover', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} />
+                </a>
+              </div>
+            )}
 
             <div style={{marginTop:24, background:'white', border:'1px solid #e5e5e5', borderRadius:8, overflow:'hidden'}}>
               <div style={{padding:'12px 16px', fontWeight:800, fontSize:13, borderBottom:'2px solid black', display:'flex', justifyContent:'space-between'}}><span>📰 NOTICIAS DE {catActiva.toUpperCase()} {customFiltradas.length>0? `+ ${customFiltradas.length} PROPIAS` : '- ROBOT GOOGLE'}</span><span style={{fontSize:10, background:'black', color:'white', padding:'2px 6px', borderRadius:4}}>AUTO</span></div>
@@ -75,7 +78,6 @@ export default function Home() {
                 ))}
             </div>
 
-            {/* AQUÍ ESTÁN LOS 15 SUBTITULOS QUE LLENAN EL HUECO MAITRO */}
             {listaLarga.length > 0 && (
               <div style={{marginTop:20, background:'white', border:'1px solid #e5e5e5', borderRadius:8, overflow:'hidden'}}>
                 <div style={{padding:'10px 16px', fontWeight:900, fontSize:12, background:'black', color:'#FFD700', letterSpacing:1}}>🔥 MAS TITULARES - PARA LLENAR EL HUECO</div>
@@ -87,14 +89,13 @@ export default function Home() {
                 ))}
               </div>
             )}
-
           </div>
+
           <div>
             <div style={{background:'white', border:'1px solid #ddd', padding:16, borderRadius:8, position:'sticky', top:90}}>
               <div className="serif" style={{fontSize:13, letterSpacing:2, fontWeight:800, marginBottom:10}}>CATEGORÍAS ACTIVAS</div>
               {cats.map(c=>(<button key={c} onClick={()=>setCatActiva(c)} style={{width:'100%', textAlign:'left', marginTop:8, padding:'12px', background: catActiva===c? 'black' : '#f9f6f0', color: catActiva===c? 'white' : 'black', border:'1px solid #ddd', borderRadius:6, cursor:'pointer', fontWeight:600, fontSize:13}}>{catActiva===c? '● ' : '○ '}{c} {catActiva===c? '(viendo)' : ''}</button>))}
               <a href="/admin" style={{display:'block', marginTop:16, padding:12, background:'#c9a86a', textAlign:'center', fontWeight:800, textDecoration:'none', color:'black', borderRadius:6}}>➕ Subir Noticia Propia</a>
-
               <div style={{marginTop:'20px', display:'flex', flexDirection:'column', gap:'16px'}}>
                 {Array.from({length:10}).map((_,i)=>{
                   const num = i+1;
@@ -107,7 +108,7 @@ export default function Home() {
                         <span style={{background:'black', color:'#FFD700', padding:'1px 5px', borderRadius:3, fontSize:8}}>{b.img?'OCUPADO':'LIBRE'}</span>
                       </div>
                       <a href={b.link} target="_blank" style={{display:'block'}}>
-                        {b.img? <img src={b.img} style={{width:'100%', height:'140px', objectFit:'cover', display:'block'}} /> : <div style={{height:'120px', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', color:'white', padding:'10px', textAlign:'center', background:'#111'}}><div style={{fontSize:14, fontWeight:900, color:'#FFD700'}}>¡ANÚNCIATE AQUÍ!</div><div style={{fontSize:10, marginTop:4}}>BANNER #{num}</div><div style={{marginTop:6, background:'#FFD700', color:'black', padding:'4px 10px', borderRadius:5, fontWeight:900, fontSize:10}}>(469) 472-8325</div></div>}
+                        {b.img? <img src={b.img} style={{width:'100%', height:'140px', objectFit:'cover', display:'block'}} alt="" /> : <div style={{height:'120px', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', color:'white', padding:'10px', textAlign:'center', background:'#111'}}><div style={{fontSize:14, fontWeight:900, color:'#FFD700'}}>¡ANÚNCIATE AQUÍ!</div><div style={{fontSize:10, marginTop:4}}>BANNER #{num}</div><div style={{marginTop:6, background:'#FFD700', color:'black', padding:'4px 10px', borderRadius:5, fontWeight:900, fontSize:10}}>(469) 472-8325</div></div>}
                       </a>
                     </div>
                   );
