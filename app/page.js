@@ -16,9 +16,23 @@ export default function Home() {
     if(saved) setCustom(JSON.parse(saved));
     const b = localStorage.getItem('taktik_banners');
     if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} }
+    const ultimaJalada = localStorage.getItem('taktik_ultima_' + catActiva);
+const ahora = Date.now();
+const unDia = 24 * 60 * 60 * 1000;
+
+if (!ultimaJalada || (ahora - parseInt(ultimaJalada) > unDia)) {
     setCargando(true);
-    fetch("/api/noticias?cat=" + encodeURIComponent(catActiva) + "&t=" + Date.now())
-   .then(r=>r.json()).then(data=>{ setNoticias(data); setCargando(false); });
+    fetch("/api/noticias?cat=" + encodeURIComponent(catActiva))
+    .then(r=>r.json()).then(data=>{ 
+        setNoticias(data); 
+        setCargando(false);
+        localStorage.setItem('taktik_ultima_' + catActiva, ahora.toString());
+        localStorage.setItem('taktik_cache_' + catActiva, JSON.stringify(data));
+    });
+} else {
+    const cache = localStorage.getItem('taktik_cache_' + catActiva);
+    if(cache){ setNoticias(JSON.parse(cache)); setCargando(false); }
+}
 
     // Escucha si guardas un banner en /admin y se actualiza solo
     const intervalo = setInterval(()=>{
