@@ -1,174 +1,125 @@
-"use client"
+"use client";
 import { useState, useEffect } from 'react';
 
-export default function Admin(){
-  const [autorizado, setAutorizado] = useState(false);
-  const [inputPass, setInputPass] = useState("");
-  const [verPass, setVerPass] = useState(false);
-  const [passActual, setPassActual] = useState("taktik2025");
-  const [nuevoPass, setNuevoPass] = useState("");
-  
-  // --- PIN DEL CEO ---
-  const [pinCEOActual, setPinCEOActual] = useState(""); // el que está guardado
-  const [pinCEOInput, setPinCEOInput] = useState(""); // el que escribe para autorizar
-  const [nuevoPinCEO, setNuevoPinCEO] = useState(""); // para crear/cambiar tu PIN
-
-  const [tab, setTab] = useState('noticia');
-  const [banners, setBanners] = useState(Array.from({length:10}).map((_,i)=>({id:i+1, img:'', link:'https://wa.me/14694728325', led:`BANNER #${i+1} DISPONIBLE - (469) 472-8325`, activo:true})));
-  const [bannerEditando, setBannerEditando] = useState(1);
+export default function Admin() {
+  const [pass, setPass] = useState('Notitaktik@26');
+  const [inputPass, setInputPass] = useState('');
+  const [pin, setPin] = useState('');
+  const [pinActual, setPinActual] = useState('');
+  const [pinNuevo, setPinNuevo] = useState('');
   const [titulo, setTitulo] = useState('');
   const [cat, setCat] = useState('El Salvador');
   const [img, setImg] = useState('');
   const [contenido, setContenido] = useState('');
+  const [tab, setTab] = useState('noticia');
+  const [banners, setBanners] = useState(Array.from({length:10},(_,i)=>({id:i+1, img:'', link:'https://wa.me/14694728325', led:`BANNER #${i+1} DISPONIBLE - (469) 472-8325`, activo:true})));
+  const [logueado, setLogueado] = useState(false);
 
   useEffect(()=>{
-    const guardado = localStorage.getItem('taktik_password') || 'taktik2025';
-    setPassActual(guardado);
-    const pinGuardado = localStorage.getItem('taktik_ceo_pin') || "";
-    setPinCEOActual(pinGuardado);
-    const b = localStorage.getItem('taktik_banners');
-    if(b){ try{ 
-      const saved = JSON.parse(b);
-      setBanners(prev=> prev.map(p=> saved.find(s=>s.id===p.id) || p));
-    }catch(e){} }
+    const p = localStorage.getItem('taktik_pass'); if(p) setPass(p);
+    const b = localStorage.getItem('taktik_banners'); if(b){ try{ const saved=JSON.parse(b); setBanners(prev=> prev.map(pr=> saved.find(s=>s.id===pr.id) || pr)); }catch(e){} }
+    const pc = localStorage.getItem('taktik_pin_ceo'); if(pc) setPin(pc);
   },[]);
 
-  const verificar = () => {
-    const guardado = localStorage.getItem('taktik_password') || 'taktik2025';
-    if(inputPass === guardado){
-      setAutorizado(true);
-    } else {
-      alert("❌ Password incorrecto maitro");
-      setInputPass("");
-    }
+  const login = ()=>{ if(inputPass===pass){ setLogueado(true); } else alert('Password incorrecto'); }
+
+  const cambiarPass = ()=>{
+    if(!pin) return alert('Poné tu PIN CEO (6 dig)');
+    if(pin!== localStorage.getItem('taktik_pin_ceo')) return alert('PIN CEO incorrecto - Solo el CEO puede cambiar pass');
+    if(inputPass.length<4) return alert('Nuevo pass muy corto');
+    localStorage.setItem('taktik_pass', inputPass);
+    setPass(inputPass); alert('Pass cambiado ✅'); setInputPass('');
   }
 
-  const guardarBanners = (nuevos) => {
-    setBanners(nuevos);
-    localStorage.setItem('taktik_banners', JSON.stringify(nuevos));
-    alert('✅ Banner guardado! Ahora recarga la página principal');
-  };
-
-  const guardarPinCEO = () => {
-    if(nuevoPinCEO.length !== 6){ alert("El PIN debe ser de 6 dígitos cabal"); return; }
-    if(pinCEOActual && pinCEOInput !== pinCEOActual){
-      alert("⛔ PIN actual incorrecto. Solo el CEO puede cambiarlo.");
-      return;
-    }
-    localStorage.setItem('taktik_ceo_pin', nuevoPinCEO);
-    setPinCEOActual(nuevoPinCEO);
-    setNuevoPinCEO("");
-    setPinCEOInput("");
-    alert(`✅ PIN de CEO guardado: ${nuevoPinCEO} - Solo vos te lo sabes`);
+  const cambiarPin = ()=>{
+    const actual = localStorage.getItem('taktik_pin_ceo');
+    if(actual && pinActual!== actual) return alert('PIN actual incorrecto');
+    if(pinNuevo.length!==6) return alert('El PIN debe ser 6 dígitos exactos');
+    localStorage.setItem('taktik_pin_ceo', pinNuevo);
+    setPin(pinNuevo); alert('PIN CEO creado/cambiado ✅'); setPinActual(''); setPinNuevo('');
   }
 
-  const cambiarPassword = () => {
-    if(!pinCEOActual){ alert("Primero tenés que crear tu PIN de CEO de 6 dígitos abajo"); return; }
-    if(pinCEOInput !== pinCEOActual){
-      alert("⛔ SOLO EL CEO PUEDE CAMBIAR EL PASSWORD. PIN de 6 dígitos incorrecto.");
-      return;
-    }
-    if(nuevoPass.length < 4){ alert("Mínimo 4 caracteres"); return; }
-    localStorage.setItem('taktik_password', nuevoPass);
-    setPassActual(nuevoPass);
-    alert(`✅ Password cambiado a: ${nuevoPass}`);
-    setNuevoPass("");
-    setPinCEOInput("");
-  }
-
-  const bannerActual = banners.find(b=>b.id===bannerEditando);
-
-  if(!autorizado){
-    return (
-      <div style={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100vh', background:'black'}}>
-        <h2 style={{color:'#FFD700'}}>🔒 Admin Taktik News</h2>
-        <div style={{position:'relative', width:280}}>
-          <input 
-            type={verPass ? "text" : "password"}
-            placeholder="Password" 
-            value={inputPass} 
-            onChange={e=>setInputPass(e.target.value)}
-            onKeyDown={e=> e.key==='Enter' && verificar()}
-            style={{padding:12, width:'100%', borderRadius:8, border:'2px solid #FFD700', textAlign:'center', paddingRight:40}}
-            autoFocus
-          />
-          <span onClick={()=>setVerPass(!verPass)} style={{position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', cursor:'pointer', fontSize:20}}>{verPass ? '🙈' : '👁️'}</span>
-        </div>
-        <button onClick={verificar} style={{marginTop:12, padding:'10px 30px', background:'#FFD700', fontWeight:900, borderRadius:8}}>ENTRAR</button>
-      </div>
-    )
-  }
+  if(!logueado) return (
+    <div style={{maxWidth:400, margin:'100px auto', padding:20, border:'1px solid #ddd', borderRadius:8}}>
+      <a href="/" style={{textDecoration:'none', fontWeight:800}}>← Volver a Taktik News</a>
+      <h2>🔐 Login Taktik</h2>
+      <input value={inputPass} onChange={e=>setInputPass(e.target.value)} placeholder="Password" type="password" style={{width:'100%', padding:10, marginTop:10}} />
+      <button onClick={login} style={{width:'100%', marginTop:10, padding:10, background:'black', color:'white', fontWeight:800}}>Entrar</button>
+    </div>
+  );
 
   return (
-    <div style={{padding:20, maxWidth:900, margin:'0 auto', fontFamily:'serif'}}>
-      <h1>📝 Panel Taktik News</h1>
-      
-      {/* --- CAJA PASSWORD + PIN CEO --- */}
-      <div style={{background:'#fff3cd', padding:12, border:'2px solid #c9a86a', borderRadius:8, marginBottom:20}}>
-        <b>🔑 Password Actual: {passActual}</b>
-        <div style={{display:'flex', gap:8, marginTop:8, flexWrap:'wrap'}}>
-          <input type="text" placeholder="Nuevo password" value={nuevoPass} onChange={e=>setNuevoPass(e.target.value)} style={{flex:1, padding:8, minWidth:120}} />
-          <input type="password" placeholder="Tu PIN CEO (6 dig)" value={pinCEOInput} onChange={e=>setPinCEOInput(e.target.value)} maxLength={6} style={{width:130, padding:8, border:'2px solid red', fontWeight:900}} />
-          <button onClick={cambiarPassword} style={{padding:'8px 12px', background:'black', color:'white', fontWeight:900, borderRadius:6}}>Cambiar Pass</button>
+    <div style={{maxWidth:900, margin:'20px auto', padding:10, fontFamily:'Arial'}}>
+
+      {/* 1- FLECHITA PARA REGRESAR */}
+      <a href="/" style={{display:'inline-block', marginBottom:10, textDecoration:'none', background:'black', color:'#FFD700', padding:'8px 14px', borderRadius:20, fontWeight:900, fontSize:13}}>← Regresar a Taktik News</a>
+
+      <h1 style={{fontFamily:'serif'}}>📝 Panel Taktik News</h1>
+
+      <div style={{background:'#fef3c7', border:'1px solid #c9a86a', padding:12, borderRadius:8}}>
+        <div style={{fontWeight:800, fontSize:14}}>🔑 Password Actual: {pass}</div>
+        <div style={{display:'flex', gap:8, marginTop:8}}>
+          <input value={inputPass} onChange={e=>setInputPass(e.target.value)} placeholder="Nuevo password" style={{flex:1, padding:8}} />
+          <input value={pin} onChange={e=>setPin(e.target.value)} placeholder="Tu PIN CEO (6 dig)" style={{width:140, padding:8, border:'2px solid red'}} />
+          <button onClick={cambiarPass} style={{background:'black', color:'white', padding:'8px 12px', borderRadius:6, fontWeight:800}}>Cambiar Pass</button>
         </div>
 
-        <div style={{marginTop:12, padding:10, background:'black', borderRadius:6}}>
-          <b style={{color:'#FFD700', fontSize:12}}>👑 CONFIGURAR TU PIN DE CEO (6 dígitos) - Solo vos:</b>
-          <div style={{display:'flex', gap:8, marginTop:6, flexWrap:'wrap'}}>
-            <input type="password" placeholder={pinCEOActual ? "PIN actual" : "No hay PIN"} value={pinCEOInput} onChange={e=>setPinCEOInput(e.target.value)} maxLength={6} style={{flex:1, padding:6}} />
-            <input type="text" placeholder="Nuevo PIN 6 dígitos" value={nuevoPinCEO} onChange={e=>setNuevoPinCEO(e.target.value)} maxLength={6} style={{flex:1, padding:6}} />
-            <button onClick={guardarPinCEO} style={{padding:'6px 12px', background:'#FFD700', color:'black', fontWeight:900, borderRadius:6}}>{pinCEOActual ? 'Cambiar PIN' : 'Crear mi PIN'}</button>
+        <div style={{background:'black', color:'white', padding:10, marginTop:10, borderRadius:6}}>
+          <div style={{fontWeight:800, color:'#FFD700', fontSize:12}}>👑 CONFIGURAR TU PIN DE CEO (6 digitos) - Solo vos:</div>
+          <div style={{display:'flex', gap:8, marginTop:8}}>
+            <input value={pinActual} onChange={e=>setPinActual(e.target.value)} placeholder="PIN actual" style={{flex:1, padding:8}} />
+            <input value={pinNuevo} onChange={e=>setPinNuevo(e.target.value)} placeholder="Nuevo PIN 6 digitos" style={{flex:1, padding:8}} />
+            <button onClick={cambiarPin} style={{background:'#FFD700', color:'black', padding:'8px 12px', borderRadius:6, fontWeight:900}}>Cambiar PIN</button>
           </div>
-          <p style={{fontSize:10, color: pinCEOActual ? '#0f0' : 'orange', marginTop:4}}>Estado: {pinCEOActual ? `✅ PIN CEO creado (****${pinCEOActual.slice(-2)})` : '⚠️ Aún no tenés PIN. Creá uno de 6 dígitos.'}</p>
+          <div style={{fontSize:10, marginTop:6, color:'#0f0'}}>Estado: {localStorage.getItem('taktik_pin_ceo')? `✅ PIN CEO creado (****${localStorage.getItem('taktik_pin_ceo')?.slice(-2)})` : '❌ Sin PIN'}</div>
         </div>
-
-        <button onClick={()=>{setAutorizado(false); setInputPass("");}} style={{marginTop:8, fontSize:11}}>Cerrar sesión</button>
+        <button onClick={()=>setLogueado(false)} style={{marginTop:8, fontSize:11}}>Cerrar sesión</button>
       </div>
 
-      <div style={{display:'flex', gap:10, marginBottom:20}}>
-        <button onClick={()=>setTab('noticia')} style={{padding:'10px 20px', background:tab==='noticia'?'#c9a86a':'white', fontWeight:900, border:'2px solid black', borderRadius:8}}>📰 PUBLICAR NOTICIA</button>
-        <button onClick={()=>setTab('banners')} style={{padding:'10px 20px', background:tab==='banners'?'#FFD700':'white', fontWeight:900, border:'2px solid black', borderRadius:8}}>🔥 BANNERS #1 al #10</button>
+      <div style={{display:'flex', gap:10, marginTop:15}}>
+        <button onClick={()=>setTab('noticia')} style={{background:tab==='noticia'?'#c9a86a':'white', padding:'10px 16px', borderRadius:8, fontWeight:800, border:'1px solid black'}}>📰 PUBLICAR NOTICIA</button>
+        <button onClick={()=>setTab('banners')} style={{background:tab==='banners'?'#c9a86a':'white', padding:'10px 16px', borderRadius:8, fontWeight:800, border:'1px solid black'}}>🔥 BANNERS #1 al #10</button>
       </div>
-      {tab==='noticia' ? (
-        <div style={{background:'#fffaf0', padding:15, border:'1px solid #ddd', borderRadius:8}}>
-          <input placeholder="Título" value={titulo} onChange={e=>setTitulo(e.target.value)} style={{width:'100%', padding:10, marginBottom:10}} />
-          <select value={cat} onChange={e=>setCat(e.target.value)} style={{width:'100%', padding:10, marginBottom:10}}><option>El Salvador</option><option>Internacional</option><option>Economía</option><option>Política</option></select>
-          <input placeholder="Link de foto" value={img} onChange={e=>setImg(e.target.value)} style={{width:'100%', padding:10, marginBottom:10}} />
-          <textarea placeholder="Contenido..." value={contenido} onChange={e=>setContenido(e.target.value)} style={{width:'100%', height:200, padding:10, marginBottom:10}} />
+
+      {tab==='noticia' && (
+        <div style={{background:'#fdf6e3', border:'1px solid #ddd', padding:12, marginTop:15, borderRadius:8}}>
+          <input value={titulo} onChange={e=>setTitulo(e.target.value)} placeholder="Título" style={{width:'100%', padding:10, marginBottom:8}} />
+          <select value={cat} onChange={e=>setCat(e.target.value)} style={{width:'100%', padding:10, marginBottom:8}}><option>El Salvador</option><option>Internacional</option><option>Economía</option><option>Política</option></select>
+          <input value={img} onChange={e=>setImg(e.target.value)} placeholder="Link de foto" style={{width:'100%', padding:10, marginBottom:8}} />
+          <textarea value={contenido} onChange={e=>setContenido(e.target.value)} placeholder="Contenido..." style={{width:'100%', height:200, padding:10}} />
           <button onClick={()=>{
-            const news = {id:Date.now(), titulo, categoria:cat, imagen:img, contenido, fecha:new Date().toISOString()};
-            const saved = JSON.parse(localStorage.getItem('taktik_custom')||'[]');
-            saved.unshift(news);
-            localStorage.setItem('taktik_custom', JSON.stringify(saved));
-            alert('Noticia publicada!');
-            setTitulo(''); setImg(''); setContenido('');
-          }} style={{width:'100%', padding:12, background:'#c9a86a', fontWeight:900}}>🚀 PUBLICAR</button>
-        </div>
-      ) : (
-        <div style={{background:'black', padding:15, borderRadius:12, border:'3px solid #FFD700'}}>
-          <h3 style={{color:'#FFD700', marginTop:0}}>🔥 EDITAR 10 BANNERS</h3>
-          <div style={{display:'flex', flexWrap:'wrap', gap:6, marginBottom:15}}>
-            {banners.map(b=>(
-              <button key={b.id} onClick={()=>setBannerEditando(b.id)} style={{padding:'6px 10px', background:bannerEditando===b.id?'#FFD700':'#333', color:bannerEditando===b.id?'black':'white', border:'1px solid #FFD700', borderRadius:6, fontWeight:900, fontSize:12}}>
-                #{b.id} {b.img?'✅':''}
-              </button>
-            ))}
-          </div>
-          <div style={{background:'white', padding:15, borderRadius:8}}>
-            <h4 style={{margin:'0 0 10px 0'}}>Editando BANNER #{bannerEditando}</h4>
-            <label style={{fontSize:12, fontWeight:800}}>Link Imagen:</label>
-            <input value={bannerActual?.img||''} onChange={e=>{ const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, img:e.target.value} : x); setBanners(nuevos); }} placeholder="https://..." style={{width:'100%', padding:8, marginBottom:10}} />
-            <label style={{fontSize:12, fontWeight:800}}>Link destino:</label>
-            <input value={bannerActual?.link||''} onChange={e=>{ const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, link:e.target.value} : x); setBanners(nuevos); }} placeholder="https://wa.me/..." style={{width:'100%', padding:8, marginBottom:10}} />
-            <label style={{fontSize:12, fontWeight:800}}>Texto LED:</label>
-            <input value={bannerActual?.led||''} onChange={e=>{ const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, led:e.target.value} : x); setBanners(nuevos); }} style={{width:'100%', padding:8, marginBottom:10}} />
-            <label style={{display:'flex', gap:8, alignItems:'center', marginBottom:12}}><input type="checkbox" checked={bannerActual?.activo} onChange={e=>{ const nuevos = banners.map(x=> x.id===bannerEditando ? {...x, activo:e.target.checked} : x); setBanners(nuevos); }} /> Activo</label>
-            <button onClick={()=>guardarBanners(banners)} style={{width:'100%', padding:12, background:'#FFD700', color:'black', fontWeight:900, borderRadius:8, border:'2px solid black'}}>💾 GUARDAR BANNER #{bannerEditando}</button>
-            {bannerActual?.img && <div style={{marginTop:15}}><p style={{fontSize:12}}>Vista previa:</p><img src={bannerActual.img} style={{width:'100%', maxHeight:150, objectFit:'cover', border:'1px solid #ddd'}} /></div>}
-          </div>
-          <button onClick={()=>guardarBanners(banners)} style={{marginTop:10, width:'100%', padding:10, background:'#222', color:'#FFD700', border:'1px solid #FFD700', borderRadius:8}}>💾 GUARDAR TODOS</button>
+            const custom = JSON.parse(localStorage.getItem('taktik_custom')||'[]');
+            custom.unshift({id:Date.now(), title:titulo, cat, img, desc:contenido, fecha:new Date().toLocaleDateString()});
+            localStorage.setItem('taktik_custom', JSON.stringify(custom));
+            alert('Publicado ✅'); setTitulo(''); setImg(''); setContenido('');
+          }} style={{width:'100%', marginTop:10, padding:12, background:'#c9a86a', fontWeight:900}}>🚀 PUBLICAR</button>
         </div>
       )}
+
+      {tab==='banners' && (
+        <div style={{marginTop:15}}>
+          {banners.map((b,i)=>(
+            <div key={b.id} style={{border:'1px solid #ddd', padding:10, marginBottom:10, borderRadius:8, background: b.img?'#e6ffed':'white'}}>
+              <div style={{fontWeight:900}}>BANNER #{b.id} {b.img?'✅ OCUPADO':'⚪ LIBRE'}</div>
+              <input value={b.img} onChange={e=>{ const nb=[...banners]; nb[i].img=e.target.value; setBanners(nb); }} placeholder="Link imagen (https://i.postimg.cc/...)" style={{width:'100%', padding:8, marginTop:6}} />
+              <input value={b.link} onChange={e=>{ const nb=[...banners]; nb[i].link=e.target.value; setBanners(nb); }} placeholder="Link destino (WhatsApp)" style={{width:'100%', padding:8, marginTop:6}} />
+              <input value={b.led} onChange={e=>{ const nb=[...banners]; nb[i].led=e.target.value; setBanners(nb); }} placeholder="Texto LED" style={{width:'100%', padding:8, marginTop:6}} />
+              <div style={{display:'flex', gap:6, marginTop:6}}>
+                <button onClick={()=>{ localStorage.setItem('taktik_banners', JSON.stringify(banners)); alert('Banner #'+b.id+' guardado ✅'); }} style={{flex:1, background:'black', color:'#FFD700', padding:8, borderRadius:6, fontWeight:800}}>Guardar Banner #{b.id} (arriba)</button>
+                <button onClick={()=>{ const nb=[...banners]; nb[i].img=''; nb[i].led=`BANNER #${b.id} DISPONIBLE - (469) 472-8325`; setBanners(nb); localStorage.setItem('taktik_banners', JSON.stringify(nb)); }} style={{background:'red', color:'white', padding:8, borderRadius:6}}>Borrar</button>
+              </div>
+            </div>
+          ))}
+          <button onClick={()=>{ localStorage.setItem('taktik_banners', JSON.stringify(banners)); alert('Todos los banners guardados ✅'); }} style={{width:'100%', padding:12, background:'#FFD700', fontWeight:900, borderRadius:8, marginTop:10}}>Guardar todos (abajo)</button>
+        </div>
+      )}
+
+      {/* 2- BOTON FINALIZAR ABAJO */}
+      <div style={{marginTop:30, borderTop:'2px solid black', paddingTop:15}}>
+        <a href="/" style={{display:'block', textAlign:'center', background:'black', color:'#FFD700', padding:'14px', borderRadius:10, fontWeight:900, textDecoration:'none', fontSize:16, letterSpacing:1}}>✅ HECHO - FINALIZAR E IR A TAKTIK NEWS →</a>
+        <div style={{textAlign:'center', fontSize:11, marginTop:6, opacity:0.6}}>Al picar aquí volvés a la página principal y verás tus banners activos</div>
+      </div>
+
     </div>
   )
 }
