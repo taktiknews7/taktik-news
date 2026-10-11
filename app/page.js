@@ -27,11 +27,11 @@ export default function Home() {
   const listaCorta = todas.slice(1, 11);
   const listaLarga = todas.slice(11, 26);
 
-  const imgCat = {
-    'El Salvador': 'https://images.unsplash.com/photo-1544985361-b420d7a77043?w=900',
-    'Internacional': 'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=900',
-    'Economía': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900',
-    'Política': 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=900'
+      const imgCat = {
+    'El Salvador': 'https://images.unsplash.com/photo-1518638150340-f706e86654b8?w=900',
+    'Internacional': 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900',
+    'Economía': 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=900',
+    'Política': 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=900'
   };
 
   return (
