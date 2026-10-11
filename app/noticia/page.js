@@ -21,7 +21,25 @@ function Contenido() {
           <b>Resumen Taktik:</b> {title}. Nuestro equipo le da seguimiento a esta información desde San Salvador con análisis propio.
         </div>
         <a href="https://wa.me/14694728325?text=Hola%20Taktik%20News%2C%20quiero%20anunciar%20mi%20negocio" target="_blank" style={{display:'block', margin:'20px 0', borderRadius:'12px', overflow:'hidden', border:'3px solid black'}}><img src="/anuncio1.png" style={{width:'100%', display:'block'}} /></a>
-        <a href={link} target="_blank" rel="noopener noreferrer" style={{display:'block', background:'black', color:'white', textAlign:'center', padding:'14px', borderRadius:8, textDecoration:'none', fontWeight:900, cursor:'pointer'}}>{`VER NOTA ORIGINAL EN ${link ? new URL(link).hostname.replace('www.','').toUpperCase() : 'BBC'} ↗`}</a>
+        <a 
+  href={nota.link} 
+  target="_blank" 
+  rel="noopener noreferrer"
+  style={{
+    display:'block',
+    width:'100%',
+    background:'black',
+    color:'white',
+    textAlign:'center',
+    padding:'14px 0',
+    borderRadius:'8px',
+    textDecoration:'none',
+    fontWeight:'bold',
+    margin:'12px 0'
+  }}
+>
+  VER NOTA ORIGINAL EN BBC / INFOBAE ↗
+</a>
         <a href="https://wa.me/14694728325?text=Hola%20Taktik%20News%2C%20quiero%20anunciar%20mi%20negocio" target="_blank" style={{display:'block', margin:'20px 0', borderRadius:'12px', overflow:'hidden', border:'3px solid black'}}><img src="/anuncio1.png" style={{width:'100%', display:'block'}} /></a>
         <a href="/" style={{display:'block', textAlign:'center', padding:10, color:'#666', textDecoration:'none'}}>← Volver al inicio</a>
       </div>
