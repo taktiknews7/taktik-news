@@ -59,12 +59,10 @@ export default function Home() {
             {principal && (
               <>
                 <span style={{background: customFiltradas.length>0 && principal.id? '#b30000' : '#c9a86a', color: customFiltradas.length>0 && principal.id? 'white' : 'black', padding:'4px 10px', fontSize:10, fontWeight:800}}>{customFiltradas.length>0 && principal.id? '🔥 EXCLUSIVA TAKTIK' : `${catActiva.toUpperCase()} • EN VIVO`}</span>
-                <a href={principal.id? `/noticia?title=${encodeURIComponent(principal.title)}&cat=${encodeURIComponent(principal.cat)}&custom=${principal.id}` : `/noticia?title=${encodeURIComponent(principal.title)}&link=${encodeURIComponent(principal.link)}&cat=${encodeURIComponent(catActiva)}`} style={{textDecoration:'none', color:'black'}}>
-                  <h1 className="serif" style={{fontSize:34, lineHeight:1.1, marginTop:10}}>{principal.title}</h1>
-                  <img src={imgCat[catActiva]}
-                </a>
-              </>
-            )}
+                        <a href={principal.id? `/noticia?title=${encodeURIComponent(principal.title)}&cat=${encodeURIComponent(principal.cat)}&custom=${principal.id}` : `/noticia?title=${encodeURIComponent(principal.title)}&cat=${encodeURIComponent(catActiva)}`}>
+          <h1 className="serif" style={{fontSize:34, lineHeight:1.1, marginTop:10}}>{principal.title}</h1>
+          <img src={imgCat[catActiva]} style={{width:'100%', height:360, objectFit:'cover', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} />
+        </a>
 
             <div style={{marginTop:24, background:'white', border:'1px solid #e5e5e5', borderRadius:8, overflow:'hidden'}}>
               <div style={{padding:'12px 16px', fontWeight:800, fontSize:13, borderBottom:'2px solid black', display:'flex', justifyContent:'space-between'}}><span>📰 NOTICIAS DE {catActiva.toUpperCase()} {customFiltradas.length>0? `+ ${customFiltradas.length} PROPIAS` : '- ROBOT GOOGLE'}</span><span style={{fontSize:10, background:'black', color:'white', padding:'2px 6px', borderRadius:4}}>AUTO</span></div>
