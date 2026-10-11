@@ -63,7 +63,7 @@ export default function Home() {
                 <a href={principal.id? "/noticia?title=" + encodeURIComponent(principal.title) + "&cat=" + encodeURIComponent(principal.cat) + "&custom=" + principal.id : "/noticia?title=" + encodeURIComponent(principal.title) + "&link=" + encodeURIComponent(principal.link) + "&cat=" + encodeURIComponent(catActiva)} style={{textDecoration:'none', color:'black'}}>
                   <h1 className="serif" style={{fontSize:34, lineHeight:1.1, marginTop:10}}>{principal.title}</h1>
                   <p style={{fontSize:13, color:'#555'}}>{principal.desc}</p>
-                  <img src={principal.img || imgCat[catActiva]} alt="principal" style={{width:'100%', height:360, objectFit:'cover', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} />
+                  <img src={principal.img || imgCat[catActiva] || 'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=900'} alt="principal" style={{width:'100%', height:360, objectFit:'cover', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1495020689067-958852a7765e?w=900'}} />
                 </a>
               </div>
             )}
