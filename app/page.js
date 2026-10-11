@@ -16,25 +16,38 @@ export default function Home() {
     if(saved) setCustom(JSON.parse(saved));
     const b = localStorage.getItem('taktik_banners');
     if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} }
+
+    // FIX 24 HORAS
     const ultimaJalada = localStorage.getItem('taktik_ultima_' + catActiva);
-const ahora = Date.now();
-const unDia = 24 * 60 * 60 * 1000;
-
-if (!ultimaJalada || (ahora - parseInt(ultimaJalada) > unDia)) {
-    setCargando(true);
-    fetch("/api/noticias?cat=" + encodeURIComponent(catActiva))
-    .then(r=>r.json()).then(data=>{ 
-        setNoticias(data); 
-        setCargando(false);
-        localStorage.setItem('taktik_ultima_' + catActiva, ahora.toString());
-        localStorage.setItem('taktik_cache_' + catActiva, JSON.stringify(data));
-    });
-} else {
+    const ahora = Date.now();
+    const unDia = 24 * 60 * 60 * 1000;
     const cache = localStorage.getItem('taktik_cache_' + catActiva);
-    if(cache){ setNoticias(JSON.parse(cache)); setCargando(false); }
-}
 
-    // Escucha si guardas un banner en /admin y se actualiza solo
+    if (!ultimaJalada || (ahora - parseInt(ultimaJalada) > unDia)) {
+        setCargando(true);
+        fetch("/api/noticias?cat=" + encodeURIComponent(catActiva))
+       .then(r=>r.json()).then(data=>{
+            setNoticias(data);
+            setCargando(false);
+            localStorage.setItem('taktik_ultima_' + catActiva, ahora.toString());
+            localStorage.setItem('taktik_cache_' + catActiva, JSON.stringify(data));
+        });
+    } else {
+        if(cache){
+          setNoticias(JSON.parse(cache));
+          setCargando(false);
+        } else {
+          setCargando(true);
+          fetch("/api/noticias?cat=" + encodeURIComponent(catActiva))
+         .then(r=>r.json()).then(data=>{
+              setNoticias(data);
+              setCargando(false);
+              localStorage.setItem('taktik_ultima_' + catActiva, ahora.toString());
+              localStorage.setItem('taktik_cache_' + catActiva, JSON.stringify(data));
+          });
+        }
+    }
+
     const intervalo = setInterval(()=>{
       const b2 = localStorage.getItem('taktik_banners');
       if(b2){ try{ setBannersAdmin(JSON.parse(b2)); }catch(e){} }
@@ -136,7 +149,10 @@ if (!ultimaJalada || (ahora - parseInt(ultimaJalada) > unDia)) {
                       <a href={b.link && b.link.includes('postimg.cc')? 'https://wa.me/50372643788' : b.link} target="_blank" style={{display:'block'}}>
                         {b.img?
                           <>
-                            <img src={b.img} style={{width:'100%', height:'140px', objectFit:'contain', background:'white', display:'block'}} alt="" onError={(e)=>{e.target.src='https://via.placeholder.com/300x140?text=BANNER'}} />
+                            {/* FIX BANNER ESTIRADO */}
+                            <div style={{width:'100%', height:'130px', background:'white', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden'}}>
+                              <img src={b.img} style={{maxWidth:'100%', maxHeight:'130px', width:'auto', height:'auto', objectFit:'contain', display:'block'}} alt="" onError={(e)=>{e.target.src='https://via.placeholder.com/300x130?text=BANNER'}} />
+                            </div>
                             <div style={{background:'black', overflow:'hidden', whiteSpace:'nowrap', borderTop:'1px solid #FFD700'}}>
                               <div style={{display:'inline-block', color:'#FFD700', fontSize:11, fontWeight:700, padding:'4px 0', animation:'scrollLED 10s linear infinite'}}>
                                 {b.led} • {b.led} • {b.led}
