@@ -17,7 +17,6 @@ export default function Home() {
     const b = localStorage.getItem('taktik_banners');
     if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} }
 
-    // FIX 24 HORAS
     const ultimaJalada = localStorage.getItem('taktik_ultima_' + catActiva);
     const ahora = Date.now();
     const unDia = 24 * 60 * 60 * 1000;
@@ -26,7 +25,7 @@ export default function Home() {
     if (!ultimaJalada || (ahora - parseInt(ultimaJalada) > unDia)) {
         setCargando(true);
         fetch("/api/noticias?cat=" + encodeURIComponent(catActiva))
-       .then(r=>r.json()).then(data=>{
+      .then(r=>r.json()).then(data=>{
             setNoticias(data);
             setCargando(false);
             localStorage.setItem('taktik_ultima_' + catActiva, ahora.toString());
@@ -39,7 +38,7 @@ export default function Home() {
         } else {
           setCargando(true);
           fetch("/api/noticias?cat=" + encodeURIComponent(catActiva))
-         .then(r=>r.json()).then(data=>{
+        .then(r=>r.json()).then(data=>{
               setNoticias(data);
               setCargando(false);
               localStorage.setItem('taktik_ultima_' + catActiva, ahora.toString());
@@ -149,7 +148,6 @@ export default function Home() {
                       <a href={b.link && b.link.includes('postimg.cc')? 'https://wa.me/50372643788' : b.link} target="_blank" style={{display:'block'}}>
                         {b.img?
                           <>
-                            {/* FIX BANNER ESTIRADO */}
                             <div style={{width:'100%', height:'130px', background:'white', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden'}}>
                               <img src={b.img} style={{maxWidth:'100%', maxHeight:'130px', width:'auto', height:'auto', objectFit:'contain', display:'block'}} alt="" onError={(e)=>{e.target.src='https://via.placeholder.com/300x130?text=BANNER'}} />
                             </div>
