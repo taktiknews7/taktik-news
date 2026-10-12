@@ -12,10 +12,14 @@ export default function Home() {
 
   useEffect(() => {
     setFechaHoy(new Date().toLocaleDateString('es-SV', {weekday:'long', day:'numeric', month:'long'}) + ' - ROBOT BBC+INFOBAE ACTIVO ✅');
-    const saved = localStorage.getItem('taktik_custom');
-    if(saved) setCustom(JSON.parse(saved));
-    const b = localStorage.getItem('taktik_banners');
-    if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} }
+
+    // JALAR DEL SERVIDOR PERMANENTE
+    fetch('/api/taktik').then(r=>r.json()).then(db=>{
+      if(db.custom?.length){ setCustom(db.custom); localStorage.setItem('taktik_custom', JSON.stringify(db.custom)); }
+      else { const saved = localStorage.getItem('taktik_custom'); if(saved) setCustom(JSON.parse(saved)); }
+      if(db.banners?.length){ setBannersAdmin(db.banners); localStorage.setItem('taktik_banners', JSON.stringify(db.banners)); }
+      else { const b = localStorage.getItem('taktik_banners'); if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} } }
+    });
 
     const ultimaJalada = localStorage.getItem('taktik_ultima_' + catActiva);
     const ahora = Date.now();
@@ -46,12 +50,6 @@ export default function Home() {
           });
         }
     }
-
-    const intervalo = setInterval(()=>{
-      const b2 = localStorage.getItem('taktik_banners');
-      if(b2){ try{ setBannersAdmin(JSON.parse(b2)); }catch(e){} }
-    }, 1000);
-    return ()=>clearInterval(intervalo);
   }, [catActiva]);
 
   const customFiltradas = custom.filter(c=>c.cat===catActiva);
@@ -100,61 +98,39 @@ export default function Home() {
                 <a href={principal.id? "/noticia?title=" + encodeURIComponent(principal.title) + "&cat=" + encodeURIComponent(principal.cat) + "&custom=" + principal.id : "/noticia?title=" + encodeURIComponent(principal.title) + "&link=" + encodeURIComponent(principal.link) + "&cat=" + encodeURIComponent(catActiva)} style={{textDecoration:'none', color:'black'}}>
                   <h1 className="serif" style={{fontSize:34, lineHeight:1.1, marginTop:10}}>{principal.title}</h1>
                   <p style={{fontSize:13, color:'#555'}}>{principal.desc}</p>
-                  <img src={principal.img || imgCat[catActiva] || 'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=900'} alt="principal" style={{width:'100%', height:360, objectFit:'contain', background:'white', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1495020689067-958852a7765e?w=900'}} />
+                  <img src={principal.img || imgCat[catActiva]} alt="principal" style={{width:'100%', height:360, objectFit:'contain', background:'white', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} />
                 </a>
               </div>
             )}
-
             <div style={{marginTop:24, background:'white', border:'1px solid #e5e5e5', borderRadius:8, overflow:'hidden'}}>
-              <div style={{padding:'12px 16px', fontWeight:800, fontSize:13, borderBottom:'2px solid black', display:'flex', justifyContent:'space-between'}}><span>📰 NOTICIAS DE {catActiva.toUpperCase()} {customFiltradas.length>0? "+ " + customFiltradas.length + " PROPIAS" : '- ROBOT BBC+INFOBAE'}</span><span style={{fontSize:10, background:'black', color:'white', padding:'2px 6px', borderRadius:4}}>AUTO</span></div>
-              {cargando? <div style={{padding:20}}>⏳ El robot está buscando...</div> :
+              <div style={{padding:'12px 16px', fontWeight:800, fontSize:13, borderBottom:'2px solid black'}}>📰 NOTICIAS DE {catActiva.toUpperCase()}</div>
+              {cargando? <div style={{padding:20}}>⏳ Buscando...</div> :
                 listaCorta.map((n,i)=>(
                   <a key={i} href={n.id? "/noticia?title=" + encodeURIComponent(n.title) + "&cat=" + encodeURIComponent(n.cat) + "&custom=" + n.id : "/noticia?title=" + encodeURIComponent(n.title) + "&link=" + encodeURIComponent(n.link) + "&cat=" + encodeURIComponent(catActiva)} style={{display:'flex', gap:12, padding:'14px 16px', borderBottom:'1px solid #f0f0f0', textDecoration:'none', color:'black', background: n.id? '#fff8e7' : 'white'}}>
-                    <div style={{minWidth:44, height:44, background: n.id? '#b30000' : catActiva==='El Salvador'? '#00205b' : '#0a5c36', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:900, borderRadius:6, fontSize:12}}>{n.id? '★' : i+2}</div>
-                    <div><div style={{fontSize:14, fontWeight:600, lineHeight:1.3}}>{n.title} {n.id && <span style={{background:'#b30000', color:'white', fontSize:9, padding:'2px 5px', borderRadius:3, marginLeft:6}}>PROPIA</span>}</div><div style={{fontSize:11, color:'#888', marginTop:4}}>{n.id? "Redacción Taktik • " + n.fecha : "Fuente: " + (n.link?.includes('bbc')?'BBC':'Infobae') + " • " + catActiva} • Click →</div></div>
-                  </a>
-                ))}
-            </div>
-
-            <div style={{marginTop:20, background:'white', border:'1px solid #e5e5e5', borderRadius:8, overflow:'hidden'}}>
-              <div style={{padding:'10px 16px', fontWeight:900, fontSize:12, background:'black', color:'#FFD700', letterSpacing:1}}>🔥 MÁS TITULARES - {listaLarga.length} EXTRAS</div>
-              {listaLarga.length===0? <div style={{padding:16, fontSize:13}}>Cargando 15 titulares extra...</div> :
-                listaLarga.map((n,i)=>(
-                  <a key={i} href={n.id? "/noticia?title=" + encodeURIComponent(n.title) + "&cat=" + encodeURIComponent(n.cat) + "&custom=" + n.id : "/noticia?title=" + encodeURIComponent(n.title) + "&link=" + encodeURIComponent(n.link) + "&cat=" + encodeURIComponent(catActiva)} style={{display:'flex', gap:10, padding:'10px 16px', borderBottom:'1px solid #f0f0f0', textDecoration:'none', color:'#111', fontSize:13, lineHeight:1.3}}>
-                    <span style={{background:'#000', color:'#FFD700', minWidth:22, height:22, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:4, fontSize:10, fontWeight:900}}>{i+12}</span>
-                    <span style={{fontWeight:600}}>{n.title}</span>
+                    <div style={{minWidth:44, height:44, background: n.id? '#b30000' : '#00205b', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:900, borderRadius:6, fontSize:12}}>{n.id? '★' : i+2}</div>
+                    <div><div style={{fontSize:14, fontWeight:600}}>{n.title}</div><div style={{fontSize:11, color:'#888', marginTop:4}}>{n.id? "Redacción Taktik • " + n.fecha : "BBC/Infobae"} • Click →</div></div>
                   </a>
                 ))}
             </div>
           </div>
-
           <div>
             <div style={{background:'white', border:'1px solid #ddd', padding:16, borderRadius:8, position:'sticky', top:90}}>
-              <div className="serif" style={{fontSize:13, letterSpacing:2, fontWeight:800, marginBottom:10}}>CATEGORÍAS ACTIVAS</div>
-              {cats.map(c=>(<button key={c} onClick={()=>setCatActiva(c)} style={{width:'100%', textAlign:'left', marginTop:8, padding:'12px', background: catActiva===c? 'black' : '#f9f6f0', color: catActiva===c? 'white' : 'black', border:'1px solid #ddd', borderRadius:6, cursor:'pointer', fontWeight:600, fontSize:13}}>{catActiva===c? '● ' : '○ '}{c} {catActiva===c? '(viendo)' : ''}</button>))}
-              <a href="/admin" style={{display:'block', marginTop:16, padding:12, background:'#c9a86a', textAlign:'center', fontWeight:800, textDecoration:'none', color:'black', borderRadius:6}}>➕ Subir Noticia Propia</a>
-
-              <div style={{marginTop:'20px', display:'flex', flexDirection:'column', gap:'16px'}}>
+              <div style={{display:'flex', flexDirection:'column', gap:'16px'}}>
                 {Array.from({length:10}).map((_,i)=>{
                   const num = i+1;
-                  const b = bannersAdmin.find(x=>x.id===num) || {id:num, img:'', link:'https://wa.me/14694728325', led:'BANNER #' + num + ' DISPONIBLE - (469) 472-8325', activo:true};
+                  const b = bannersAdmin.find(x=>x.id===num) || {id:num, img:'', link:'https://wa.me/14694728325', led:'BANNER #' + num + ' DISPONIBLE', activo:true};
                   if(b.activo===false) return null;
                   return (
                     <div key={num} style={{background:'black', borderRadius:'12px', border:'2px solid #FFD700', overflow:'hidden'}}>
-                      <div style={{background:'#FFD700', color:'black', fontSize:9, fontWeight:900, padding:'4px 8px', display:'flex', justifyContent:'space-between'}}>
-                        <span>BANNER #{num}</span>
-                        <span style={{background:'black', color:'#FFD700', padding:'1px 5px', borderRadius:3, fontSize:8}}>{b.img?'OCUPADO':'LIBRE'}</span>
-                      </div>
-                      <a href={b.link && b.link.includes('postimg.cc')? 'https://wa.me/50372643788' : b.link} target="_blank" style={{display:'block'}}>
+                      <div style={{background:'#FFD700', color:'black', fontSize:9, fontWeight:900, padding:'4px 8px', display:'flex', justifyContent:'space-between'}}><span>BANNER #{num}</span><span style={{background:'black', color:'#FFD700', padding:'1px 5px', borderRadius:3, fontSize:8}}>{b.img?'OCUPADO':'LIBRE'}</span></div>
+                      <a href={b.link} target="_blank" style={{display:'block'}}>
                         {b.img?
                           <>
                             <div style={{width:'100%', height:'130px', background:'white', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden'}}>
-                              <img src={b.img} style={{maxWidth:'100%', maxHeight:'130px', width:'auto', height:'auto', objectFit:'contain', display:'block'}} alt="" onError={(e)=>{e.target.src='https://via.placeholder.com/300x130?text=BANNER'}} />
+                              <img src={b.img} style={{maxWidth:'100%', maxHeight:'130px', width:'auto', height:'auto', objectFit:'contain', display:'block'}} alt="" />
                             </div>
                             <div style={{background:'black', overflow:'hidden', whiteSpace:'nowrap', borderTop:'1px solid #FFD700'}}>
-                              <div style={{display:'inline-block', color:'#FFD700', fontSize:11, fontWeight:700, padding:'4px 0', animation:'scrollLED 10s linear infinite'}}>
-                                {b.led} • {b.led} • {b.led}
-                              </div>
+                              <div style={{display:'inline-block', color:'#FFD700', fontSize:11, fontWeight:700, padding:'4px 0', animation:'scrollLED 10s linear infinite'}}>{b.led} • {b.led}</div>
                             </div>
                           </>
                         : <div style={{height:'120px', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', color:'white', padding:'10px', textAlign:'center', background:'#111'}}><div style={{fontSize:14, fontWeight:900, color:'#FFD700'}}>¡ANÚNCIATE AQUÍ!</div><div style={{fontSize:10, marginTop:4}}>BANNER #{num}</div><div style={{marginTop:6, background:'#FFD700', color:'black', padding:'4px 10px', borderRadius:5, fontWeight:900, fontSize:10}}>(469) 472-8325</div></div>}
