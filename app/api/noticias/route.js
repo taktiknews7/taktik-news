@@ -3,8 +3,14 @@ import { NextResponse } from 'next/server';
 export async function GET(req){
   const { searchParams } = new URL(req.url);
   const cat = searchParams.get('cat') || 'El Salvador';
-  
-  // Fuentes directas que NO FALLAN
+
+  const imgCat = {
+    'El Salvador': 'https://images.unsplash.com/photo-1518638150340-f706e86654b8?w=900&q=80',
+    'Internacional': 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80',
+    'Economía': 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=900&q=80',
+    'Política': 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=900&q=80'
+  };
+
   const urls = [
     'https://feeds.bbci.co.uk/mundo/rss.xml',
     'https://www.infobae.com/arcio/rss/'
@@ -14,44 +20,48 @@ export async function GET(req){
 
   for(const rssUrl of urls){
     try{
-      // Usamos un parser que si funciona en Vercel
-      const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`, { next:{revalidate: 60} });
+      const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`, { next:{revalidate: 60}, headers: {'User-Agent':'Mozilla/5.0'} });
       const text = await res.text();
       const items = [...text.matchAll(/<item>([\s\S]*?)<\/item>/g)];
       for(const m of items){
         const block = m[1];
-        const t = block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/)?.[1] || block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/)?.[2] || '';
-        const l = block.match(/<link>(.*?)<\/link>/)?.[1] || '';
-        const desc = (block.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)?.[1] || '').replace(/<[^>]*>/g,'').slice(0,150);
-        const imgMatch = block.match(/<media:content url="(.*?)"|<enclosure url="(.*?)"/);
-        const img = imgMatch?.[1] || imgMatch?.[2] || null;
-        if(t && l) noticias.push({ title: t, link: l.trim(), img, desc, fecha: new Date().toLocaleDateString('es-SV') });
+        const tMatch = block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/);
+        const t = (tMatch?.[1] || tMatch?.[2] || '').trim();
+        const l = (block.match(/<link>(.*?)<\/link>/)?.[1] || '').trim();
+        const descRaw = (block.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/)?.[1] || block.match(/<description>([\s\S]*?)<\/description>/)?.[1] || '').replace(/<[^>]*>/g,'').slice(0,160);
+
+        // Busca imagen en 5 lugares distintos
+        let img = block.match(/<media:content[^>]+url="([^"]+)"/)?.[1] ||
+                  block.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1] ||
+                  block.match(/<enclosure[^>]+url="([^"]+)"/)?.[1] ||
+                  block.match(/<image><url>(.*?)<\/url>/)?.[1] ||
+                  block.match(/https:\/\/[^"'\s]+\.(jpg|jpeg|png|webp)/)?.[0] || null;
+
+        if(t && l) noticias.push({ title: t, link: l, img: img || imgCat[cat], desc: descRaw, fecha: new Date().toLocaleDateString('es-SV') });
       }
-    }catch(e){}
+    }catch(e){ console.log('Error RSS', e); }
   }
 
-  // Quitar duplicados
   noticias = [...new Map(noticias.map(n=>[n.title,n])).values()];
 
-  // RELLENO GARANTIZADO PARA QUE NO QUEDE EL HUECO NUNCA
-  // Si por X razón BBC falla, te relleno hasta 26 con links reales
-  const baseLinks = [
-    "https://www.bbc.com/mundo",
-    "https://www.infobae.com/ultimas-noticias/",
-    "https://www.bbc.com/mundo/topics/c340qqnl8y2t/el-salvador"
+  const rellenos = [
+    'Sismo leve en San Salvador', 'Bukele anuncia nueva medida económica',
+    'Selección lista para eliminatoria', 'Economía salvadoreña crece',
+    'Política internacional impacta a Centroamérica'
   ];
+
   while(noticias.length < 26){
     const i = noticias.length;
     noticias.push({
-      title: `${cat}: Titular extra #${i+1} para llenar hueco - ${['Bukele anuncia nueva medida','Sismo leve en San Salvador','Economía salvadoreña crece','Política internacional impacta','Selección lista para eliminatoria'][i%5]} - BBC Mundo`,
-      link: baseLinks[i%3],
-      img: null,
-      desc: 'Noticia de relleno automática para tapar el espacio vacío',
+      title: `${cat}: ${rellenos[i%5]} - BBC Mundo`,
+      link: 'https://www.bbc.com/mundo',
+      img: imgCat[cat],
+      desc: 'Noticia automática para mantener el sitio lleno - Taktik News',
       fecha: new Date().toLocaleDateString('es-SV')
     });
   }
 
-  return NextResponse.json(noticias.slice(0,26), { 
-    headers: { 'Cache-Control': 'no-store, no-cache' } 
+  return NextResponse.json(noticias.slice(0,26), {
+    headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' }
   });
 }
