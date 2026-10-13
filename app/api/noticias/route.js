@@ -20,12 +20,25 @@ export async function GET(req){
 
   for(const rss of fuentes){
     try{
-      // Método 1: rss2json es el que NO falla en Vercel
       const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`, { next:{revalidate: 120} });
       const data = await r.json();
       if(data.items){
         for(const item of data.items){
-          const img = item.enclosure?.link || item.thumbnail || item.enclosure?.url || imgCat[cat];
+          // --- AQUI ESTABA EL ERROR ---
+          let rawImg = item.enclosure?.link || item.thumbnail || item.enclosure?.url || imgCat[cat];
+          let img = rawImg;
+
+          // --- ESTO ES LO NUEVO QUE ME PREGUNTASTE, SIEMPRE VA ---
+          if(img && img.startsWith('http')){
+            img = img.replace('320x180','800x450').replace('360','800').replace('w=320','w=800').replace('144x81','800x450');
+            // Si viene de BBC con _320/ lo subimos a _800/
+            if(img.includes('bbci.co.uk') || img.includes('ichef')){
+              img = img.replace('/320/','/800/').replace('_320','_800');
+            }
+          } else {
+            img = imgCat[cat];
+          }
+
           noticias.push({
             title: item.title?.replace(/<!\[CDATA\[|\]\]>/g,'').trim(),
             link: item.link,
@@ -40,7 +53,6 @@ export async function GET(req){
     }
   }
 
-  // Si aún así falla, busca directo
   if(noticias.length < 5){
     try{
       const res = await fetch(fuentes[0], { next:{revalidate:60} });
@@ -56,10 +68,8 @@ export async function GET(req){
     }catch(e){}
   }
 
-  // Quitar duplicados
   noticias = [...new Map(noticias.map(n=>[n.title,n])).values()];
 
-  // RELLENO SOLO SI DE VERDAD NO HAY NADA
   while(noticias.length < 26){
     noticias.push({
       title: `${cat}: ${['Bukele anuncia medida','Sismo en San Salvador','Economía crece','Selección lista','Política internacional'][noticias.length%5]} - BBC`,
