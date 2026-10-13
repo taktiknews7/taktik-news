@@ -43,13 +43,23 @@ export async function GET(req){
     }catch{ return []; }
   }
 
-  async function fotoReal(link){
+    async function fotoReal(link){
     try{
-      if(link.includes('google.com')) return ''; // NUNCA jalar logo de Google
-      const c = new AbortController(); setTimeout(()=>c.abort(), 3500);
-      const r = await fetch(link, { headers:{'User-Agent':'Mozilla/5.0'}, signal:c.signal, next:{revalidate: 3600}});
+      if(link.includes('google.com')) return '';
+      const r = await fetch(link, {
+        headers:{
+          'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept':'text/html'
+        },
+        next:{revalidate: 3600}
+      });
       const html = await r.text();
-      let img = (html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)||[])[1] || '';
+      let img =
+        (html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)||[])[1] ||
+        (html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i)||[])[1] ||
+        (html.match(/<img[^>]+class=["'][^"']*wp-post-image[^"']*["'][^>]+src=["']([^"']+)["']/i)||[])[1] ||
+        '';
+      if(!img) return '';
       if(img.startsWith('//')) img='https:'+img;
       if(img.includes('google') || img.includes('logo')) return '';
       return img.split('?')[0];
@@ -77,7 +87,7 @@ export async function GET(req){
         title: it.title,
         desc: `${cat} - ${new Date().toLocaleDateString('es-SV')} - ${it.link.includes('elmundo')?'El Mundo SV': it.link.includes('elsalvadortimes')?'El Salvador Times':'Medio SV'}`,
         link: it.link,
-        img: real || it.img || 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=900',
+        img: real || it.img || `https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=900&auto=format&fit=crop&q=80&seed=${encodeURIComponent(it.title.slice(0,10))}`,
         cat
       };
     }));
