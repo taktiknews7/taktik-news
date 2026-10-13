@@ -15,8 +15,18 @@ export default function Home() {
 
     // JALAR DEL SERVIDOR PERMANENTE
     fetch('/api/taktik').then(r=>r.json()).then(db=>{
-      if(db.custom?.length){ setCustom(db.custom); localStorage.setItem('taktik_custom', JSON.stringify(db.custom)); }
-      else { const saved = localStorage.getItem('taktik_custom'); if(saved) setCustom(JSON.parse(saved)); }
+    const filtrar24h = (arr) => (arr||[]).filter(c=>{ 
+  const t = new Date(c.createdAt || 0).getTime(); 
+  return Date.now() - t < 24*60*60*1000; 
+});
+if(db.custom?.length){ 
+  const f = filtrar24h(db.custom); 
+  setCustom(f); 
+  localStorage.setItem('taktik_custom', JSON.stringify(f)); 
+} else { 
+  const saved = localStorage.getItem('taktik_custom'); 
+  if(saved){ try{ setCustom(filtrar24h(JSON.parse(saved))); }catch(e){} } 
+}  
       if(db.banners?.length){ setBannersAdmin(db.banners); localStorage.setItem('taktik_banners', JSON.stringify(db.banners)); }
       else { const b = localStorage.getItem('taktik_banners'); if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} } }
     });
