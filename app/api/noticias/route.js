@@ -25,19 +25,11 @@ export async function GET(req){
       if(data.items){
         for(const item of data.items){
           // --- AQUI ESTABA EL ERROR ---
-          let rawImg = item.enclosure?.link || item.thumbnail || item.enclosure?.url || imgCat[cat];
-          let img = rawImg;
-
-          // --- ESTO ES LO NUEVO QUE ME PREGUNTASTE, SIEMPRE VA ---
-          if(img && img.startsWith('http')){
-            img = img.replace('320x180','800x450').replace('360','800').replace('w=320','w=800').replace('144x81','800x450');
-            // Si viene de BBC con _320/ lo subimos a _800/
-            if(img.includes('bbci.co.uk') || img.includes('ichef')){
-              img = img.replace('/320/','/800/').replace('_320','_800');
-            }
-          } else {
-            img = imgCat[cat];
-          }
+         let rawImg = item.enclosure?.link || item.thumbnail || item.enclosure?.url || imgCat[cat];
+let img = rawImg;
+if(!img || img.includes('320') || img.includes('144') || img.includes('ichef') || img.includes('bbci.co.uk')){
+  img = imgCat[cat];
+} 
 
           noticias.push({
             title: item.title?.replace(/<!\[CDATA\[|\]\]>/g,'').trim(),
