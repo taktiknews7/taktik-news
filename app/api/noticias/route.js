@@ -11,7 +11,7 @@ export async function GET(req){
 
   async function cargarRSS(url){
     try{
-      const r = await fetch(url, { headers:{'User-Agent':'Mozilla/5.0'}, next:{revalidate: 3600}});
+      const r = await fetch(url, { headers:{'User-Agent':'Mozilla/5.0'}, next:{revalidate: 86400}});
       if(!r.ok) return [];
       const xml = await r.text();
       return [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(m=>{
