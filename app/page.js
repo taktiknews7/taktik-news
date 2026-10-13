@@ -108,7 +108,7 @@ if(db.custom?.length){
                 <a href={principal.id? "/noticia?title=" + encodeURIComponent(principal.title) + "&cat=" + encodeURIComponent(principal.cat) + "&custom=" + principal.id : "/noticia?title=" + encodeURIComponent(principal.title) + "&link=" + encodeURIComponent(principal.link) + "&cat=" + encodeURIComponent(catActiva)} style={{textDecoration:'none', color:'black'}}>
                   <h1 className="serif" style={{fontSize:34, lineHeight:1.1, marginTop:10}}>{principal.title}</h1>
                   <p style={{fontSize:13, color:'#555'}}>{principal.desc}</p>
-                  <img src={principal.img && principal.img.startsWith('http')? principal.img : imgCat[catActiva]} onError={(e)=>{e.target.src = imgCat[catActiva]}} alt="principal" style={{width:'100%', height:360, objectFit:'cover', background:'white', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} />
+                  <img src={principal.img && principal.img.startsWith('http')? principal.img : imgCat[catActiva]} onError={(e)=>{e.currentTarget.onerror=null; e.currentTarget.src=imgCat[catActiva]}} alt="principal" style={{width:'100%', height:360, objectFit:'cover', background:'white', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} />
                 </a>
               </div>
             )}
