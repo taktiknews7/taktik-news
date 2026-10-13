@@ -32,7 +32,11 @@ function Contenido(){
       <h1 style={{fontSize:28, marginTop:12, fontWeight:900, lineHeight:1.2}}>{customNota?.title || title}</h1>
       <div style={{fontSize:11, color:'#888', marginTop:8}}>{cat.toUpperCase()} • {customNota? 'Redacción Taktik' : 'Fuente: ' + hostname} • {customNota?.fecha || ''}</div>
 
-      {customNota?.img && <img src={customNota.img} style={{width:'100%', height:360, objectFit:'cover', marginTop:14, borderRadius:8}} alt="" />}
+      // ASÍ ESTÁ (te da pispileo):
+{customNota?.img && <img src={customNota.img} style={{width:'100%', height:360, objectFit:'cover', marginTop:14, borderRadius:8}} alt="" />}
+
+// PONLA ASÍ (ya no pispilea):
+{customNota?.img && <img src={customNota.img} onError={(e)=>{e.currentTarget.onerror=null; e.currentTarget.src='/logo.png'}} style={{width:'100%', height:360, objectFit:'cover', marginTop:14, borderRadius:8}} alt="" />}
 
       <p style={{marginTop:16, lineHeight:1.6, color:'#222', fontSize:15, whiteSpace:'pre-wrap'}}>
         {customNota?.contenido || 'Resumen Taktik generado automáticamente. Esta es una referencia de la nota original. Para leer el contenido completo, debes visitar la fuente.'}
