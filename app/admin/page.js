@@ -132,7 +132,7 @@ export default function Admin() {
             <input value={pinActual} onChange={e=>setPinActual(e.target.value)} placeholder="PIN actual (por defecto 2026)" type="password" style={{width:'100%', padding:10, marginBottom:8}} />
             <input value={pinNuevo} onChange={e=>setPinNuevo(e.target.value)} placeholder="Nueva contraseña (ej: MiClave2026)" type="password" style={{width:'100%', padding:10, marginBottom:8}} />
             <button onClick={cambiarPasswordConPin} style={{width:'100%', padding:12, background:'black', color:'white', fontWeight:900, borderRadius:8}}>Cambiar contraseña con PIN</button>
-            <div style={{marginTop:10, fontSize:12}}>Contraseña actual guardada: <b>{pass}</b> | PIN actual: <b>{pin}</b></div>
+            
           </div>
           <div style={{border:'1px solid #ddd', padding:15, borderRadius:8, background:'#f0f7ff'}}>
             <h3>🔐 Cambiar PIN de acceso</h3>
