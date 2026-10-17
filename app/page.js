@@ -136,8 +136,8 @@ if(db.custom?.length){
                       <a href={b.link} target="_blank" style={{display:'block'}}>
                         {b.img?
                           <>
-                            <div style={{width:'100%', height:'130px', background:'white', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden'}}>
-                              <img src={b.img} style={{maxWidth:'100%', maxHeight:'130px', width:'auto', height:'auto', objectFit:'contain', display:'block'}} alt="" />
+                            <div style={{width:'100%', height:'100px', background:'white', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden'}}>
+                              <img src={b.img} style={{maxWidth:'80%', maxHeight:'90px', width:'auto', height:'auto', objectFit:'contain', display:'block'}} alt="" />
                             </div>
                             <div style={{background:'black', overflow:'hidden', whiteSpace:'nowrap', borderTop:'1px solid #FFD700'}}>
                               <div style={{display:'inline-block', color:'#FFD700', fontSize:11, fontWeight:700, padding:'4px 0', animation:'scrollLED 10s linear infinite'}}>{b.led} • {b.led}</div>
