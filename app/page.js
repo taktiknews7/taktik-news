@@ -131,7 +131,7 @@ if(db.custom?.length){
                   const b = bannersAdmin.find(x=>x.id===num) || {id:num, img:'', link:'https://wa.me/14694728325', led:'BANNER #' + num + ' DISPONIBLE', activo:true};
                   if(b.activo===false) return null;
                   return (
-                    <div key={num} style={{background:'black', borderRadius:'12px', border:'2px solid #FFD700', overflow:'hidden'}}>
+                    <div key={num} style={{background:'black', borderRadius:'12px', border:'2px solid #FFD700', overflow:'hidden', width:'100%', maxWidth:'360px', margin:'0 auto'}}>
                       <div style={{background:'#FFD700', color:'black', fontSize:9, fontWeight:900, padding:'4px 8px', display:'flex', justifyContent:'space-between'}}><span>BANNER #{num}</span><span style={{background:'black', color:'#FFD700', padding:'1px 5px', borderRadius:3, fontSize:8}}>{b.img?'OCUPADO':'LIBRE'}</span></div>
                       <a href={b.link} target="_blank" style={{display:'block'}}>
                         {b.img?
