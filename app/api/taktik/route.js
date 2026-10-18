@@ -1,14 +1,31 @@
 import { NextResponse } from 'next/server';
 
-// En Vercel no podemos usar fs, por eso el custom lo guardamos en el navegador
-// El filtro de 24h lo hacemos en app/page.js
+if (!globalThis.taktikStore) {
+  globalThis.taktikStore = { custom: [], banners: [] };
+}
 
 export async function GET(){
-  return NextResponse.json({ custom: [] }, { headers:{'Cache-Control':'no-store'} });
+  return NextResponse.json(globalThis.taktikStore, { headers:{'Cache-Control':'no-store, no-cache, must-revalidate'} });
 }
 
 export async function POST(req){
   const body = await req.json();
-  // No guardamos en servidor, solo decimos OK y el page.js lo guarda con createdAt
-  return NextResponse.json({ ok: true, item: { ...body, createdAt: new Date().toISOString() } });
+  if (!globalThis.taktikStore) globalThis.taktikStore = { custom: [], banners: [] };
+
+  // Si vienen banners del admin #1 al #10
+  if (body.banners) {
+    globalThis.taktikStore.banners = body.banners;
+    return NextResponse.json({ ok: true, banners: body.banners });
+  }
+
+  // Si es noticia custom
+  if (body.title) {
+    const item = { ...body, createdAt: new Date().toISOString() };
+    globalThis.taktikStore.custom.unshift(item);
+    // Solo guardamos las últimas 50
+    globalThis.taktikStore.custom = globalThis.taktikStore.custom.slice(0,50);
+    return NextResponse.json({ ok: true, item });
+  }
+
+  return NextResponse.json({ ok: true });
 }
