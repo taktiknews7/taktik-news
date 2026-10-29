@@ -1,1 +1,9 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.arqlovostudios.taktiknews",
+        "sha256_cert_fingerprints": ["B1:E2:D0:93:DA:3C:62:F2:FE:5E:8F:EE:D9:C5:CB:6E:4A:9E:8B:A7:C3:46:88:13:4B:32:D4:28:02:72:F2:2B"]
+      }
+    }]
 
