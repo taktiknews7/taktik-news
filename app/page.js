@@ -12,8 +12,6 @@ export default function Home() {
 
   useEffect(() => {
     setFechaHoy(new Date().toLocaleDateString('es-SV', {weekday:'long', day:'numeric', month:'long'}) + ' - ROBOT BBC+INFOBAE ACTIVO ✅');
-
-    // JALAR DEL SERVIDOR PERMANENTE
     fetch('/api/taktik').then(r=>r.json()).then(db=>{
     const filtrar24h = (arr) => (arr||[]).filter(c=>{ 
   const t = new Date(c.createdAt || 0).getTime(); 
@@ -81,6 +79,15 @@ if(db.custom?.length){
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap');
         body{margin:0;background:#f9f6f0;font-family:Inter,sans-serif}.serif{font-family:'Playfair Display',serif}
         @keyframes scrollLED { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
+        .grid-principal{max-width:1200px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1.7fr 0.8fr;gap:28px}
+        .img-principal{width:100%;height:360px;object-fit:cover;background:white;margin-top:12px;border-radius:8px;border:1px solid #ddd}
+        .sticky-banners{background:white;border:1px solid #ddd;padding:16px;border-radius:8px;position:sticky;top:90px}
+        @media(max-width:768px){
+          .grid-principal{display:block !important; padding:12px !important;}
+          .img-principal{height:220px !important;}
+          .sticky-banners{position:static !important; margin-top:20px !important;}
+          .serif{font-size:24px !important;}
+        }
       `}</style>
       <main>
         <header style={{background:'black', color:'white', position:'sticky', top:0, zIndex:50}}>
@@ -100,7 +107,7 @@ if(db.custom?.length){
           </div>
         </header>
 
-        <div style={{maxWidth:1200, margin:'0 auto', padding:20, display:'grid', gridTemplateColumns:'1.7fr 0.8fr', gap:28}}>
+        <div className="grid-principal">
           <div>
             {principal && (
               <div>
@@ -108,7 +115,7 @@ if(db.custom?.length){
                 <a href={principal.id? "/noticia?title=" + encodeURIComponent(principal.title) + "&cat=" + encodeURIComponent(principal.cat) + "&custom=" + principal.id : "/noticia?title=" + encodeURIComponent(principal.title) + "&link=" + encodeURIComponent(principal.link) + "&cat=" + encodeURIComponent(catActiva)} style={{textDecoration:'none', color:'black'}}>
                   <h1 className="serif" style={{fontSize:34, lineHeight:1.1, marginTop:10}}>{principal.title}</h1>
                   <p style={{fontSize:13, color:'#555'}}>{principal.desc}</p>
-                  <img src={principal.img && principal.img.startsWith('http')? principal.img : imgCat[catActiva]} onError={(e)=>{e.currentTarget.onerror=null; e.currentTarget.src=imgCat[catActiva]}} alt="principal" style={{width:'100%', height:360, objectFit:'cover', background:'white', marginTop:12, borderRadius:8, border:'1px solid #ddd'}} />
+                  <img src={principal.img && principal.img.startsWith('http')? principal.img : imgCat[catActiva]} onError={(e)=>{e.currentTarget.onerror=null; e.currentTarget.src=imgCat[catActiva]}} alt="principal" className="img-principal" />
                 </a>
               </div>
             )}
@@ -124,7 +131,7 @@ if(db.custom?.length){
             </div>
           </div>
           <div>
-            <div style={{background:'white', border:'1px solid #ddd', padding:16, borderRadius:8, position:'sticky', top:90}}>
+            <div className="sticky-banners">
               <div style={{display:'flex', flexDirection:'column', gap:'16px'}}>
                 {Array.from({length:10}).map((_,i)=>{
                   const num = i+1;
