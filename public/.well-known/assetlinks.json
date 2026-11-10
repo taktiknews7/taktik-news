@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "com.arqlovostudios.taktiknews",
-        "sha256_cert_fingerprints": ["A9:25:99:78:69:CC:E1:4D:45:2B:5B:86:A2:96:3D:C6:38:05:CA:9B:8B:B4:79:F4:93:DD:F1:49:80:E1:BF:5D"]
+        "sha256_cert_fingerprints": ["8A:F2:38:5D:2C:CD:3E:D6:26:91:9C:01:4D:26:2B:33:20:C8:C6:BA:59:18:CD:26:4D:0A:42:AA:C2:4A:EF:D9"]
       }
     }]
