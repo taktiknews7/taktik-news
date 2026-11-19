@@ -1,6 +1,6 @@
 export default function Privacidad() {
   return (
-    <main style={{ padding: 20, fontFamily: 'sans-serif', maxWidth: 700, margin: 'auto' }}>
+    <main style={{ padding: 20, fontFamily: 'sans-serif', maxWidth: 700, margin: 'auto', backgroundColor: 'white', color: 'black', minHeight: '100vh' }}>
       <h1>Política de Privacidad - Taktik News</h1>
       <p>Última actualización: 19 de noviembre de 2026</p>
       <p>Taktik News respeta tu privacidad. Esta app muestra noticias y no recopila, almacena ni comparte información personal identificable de los usuarios.</p>
