@@ -152,7 +152,41 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </main>
+              {/* FOOTER TAKTIK - PARA GOOGLE PLAY */}
+        <footer style={{background:'#111', color:'white', padding:'30px 16px', marginTop:'30px'}}>
+          <div style={{maxWidth:1200, margin:'0 auto', textAlign:'center'}}>
+            <h2 style={{margin:'0 0 8px 0', fontSize:22}}>TAKTIK NEWS</h2>
+            <p style={{margin:'0 0 16px 0', opacity:0.8}}>Noticias al Caliente de El Salvador para la gente</p>
+            
+            <div style={{display:'flex', justifyContent:'center', gap:20, flexWrap:'wrap', marginBottom:20}}>
+              <a href="#nosotros" style={{color:'#c9a86a', fontWeight:700}}>Quiénes Somos</a>
+              <a href="#contacto" style={{color:'#c9a86a', fontWeight:700}}>Contáctanos</a>
+              <a href="#privacidad" style={{color:'#c9a86a', fontWeight:700}}>Política de Privacidad</a>
+            </div>
+
+            <div id="nosotros" style={{background:'#222', padding:20, borderRadius:10, textAlign:'left', maxWidth:800, margin:'0 auto 16px auto'}}>
+              <h3>Quiénes Somos</h3>
+              <p style={{fontSize:14, lineHeight:1.6, opacity:0.9}}>Taktik News es un medio digital salvadoreño creado para informar a la gente de forma rápida, clara y al caliente. Nuestro equipo editorial revisa y publica contenido original y actualizado de El Salvador y el mundo.</p>
+            </div>
+
+            <div id="contacto" style={{background:'#222', padding:20, borderRadius:10, textAlign:'left', maxWidth:800, margin:'0 auto 16px auto'}}>
+              <h3>Contáctanos</h3>
+              <p style={{fontSize:14, lineHeight:1.6}}>¿Tenés una noticia, una queja o querés anunciarte?<br/>
+              <b>Correo:</b> arq.lovomerlos@gmail.com<br/>
+              <b>WhatsApp:</b> (469) 472-8325<br/>
+              <b>Ubicación:</b> El Salvador</p>
+              <a href="mailto:arq.lovomerlos@gmail.com" style={{display:'inline-block', background:'#c9a86a', color:'black', padding:'10px 18px', borderRadius:8, fontWeight:800, textDecoration:'none'}}>Enviar Correo</a>
+            </div>
+
+            <div id="privacidad" style={{background:'#222', padding:20, borderRadius:10, textAlign:'left', maxWidth:800, margin:'0 auto'}}>
+              <h3>Política de Privacidad</h3>
+              <p style={{fontSize:13, lineHeight:1.6, opacity:0.9}}>Taktik News respeta tu privacidad. Nuestra app no recopila información personal sensible sin tu consentimiento. Si nos contactas por correo, solo usamos tu información para responderte. Para preguntas sobre privacidad, escribinos a arq.lovomerlos@gmail.com</p>
+            </div>
+
+            <p style={{fontSize:12, opacity:0.6, marginTop:20}}>© 2026 Taktik News - El Salvador | Contacto: arq.lovomerlos@gmail.com</p>
+          </div>
+        </footer>
+                </main>
     </>
   )
 }
