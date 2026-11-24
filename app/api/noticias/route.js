@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 export async function GET(req){
   const { searchParams } = new URL(req.url);
   const cat = (searchParams.get('cat') || 'El Salvador').trim();
@@ -11,7 +12,7 @@ export async function GET(req){
 
   async function cargarRSS(url){
     try{
-      const r = await fetch(url, { headers:{'User-Agent':'Mozilla/5.0'}, next:{revalidate: 86400}});
+      const r = await fetch(url, { headers:{'User-Agent':'Mozilla/5.0'}, next:{revalidate: 0, cache: 'no-store'}});
       if(!r.ok) return [];
       const xml = await r.text();
       return [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(m=>{
@@ -32,7 +33,7 @@ export async function GET(req){
 
   async function cargarBBC(){
     try{
-      const r = await fetch('https://feeds.bbci.co.uk/mundo/rss.xml', { headers:{'User-Agent':'Mozilla/5.0'}, next:{revalidate: 3600}});
+      const r = await fetch('https://feeds.bbci.co.uk/mundo/rss.xml', { headers:{'User-Agent':'Mozilla/5.0'}, next:{revalidate: 0, cache: 'no-store'}});
       const xml = await r.text();
       return [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(m=>{
         const b=m[1];
@@ -51,7 +52,7 @@ export async function GET(req){
           'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
           'Accept':'text/html'
         },
-        next:{revalidate: 3600}
+        next:{revalidate: 0, cache: 'no-store'}
       });
       const html = await r.text();
       let img =
@@ -94,7 +95,7 @@ export async function GET(req){
 
     const filtradas = final.filter(n=>!n.title.toLowerCase().includes('guilfoyle') &&!n.title.toLowerCase().includes('grecia') && n.img &&!n.img.includes('google'));
 
-    return Response.json(filtradas.length>0? filtradas : final, { headers:{ 'Cache-Control':'public, s-maxage=3600, stale-while-revalidate=3600' } });
+    return Response.json(filtradas.length>0? filtradas : final, { headers:{ 'Cache-Control':''no-store, no-cache, must-revalidate' } });
 
   }catch(e){
     return Response.json([
