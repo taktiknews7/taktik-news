@@ -29,35 +29,18 @@ export default function Home() {
       else { const b = localStorage.getItem('taktik_banners'); if(b){ try{ setBannersAdmin(JSON.parse(b)); }catch(e){} } }
     });
 
-    const ultimaJalada = localStorage.getItem('taktik_ultima_' + catActiva);
-    const ahora = Date.now();
-    const unDia = 24 * 60 * 60 * 1000;
-    const cache = localStorage.getItem('taktik_cache_' + catActiva);
-
-    if (!ultimaJalada || (ahora - parseInt(ultimaJalada) > unDia)) {
-        setCargando(true);
-        fetch("/api/noticias?cat=" + encodeURIComponent(catActiva))
+      // SIEMPRE FRESCO - SIN CACHE DE 24H
+    setCargando(true);
+    fetch("/api/noticias?cat=" + encodeURIComponent(catActiva) + "&t=" + Date.now(), { cache: 'no-store' })
       .then(r=>r.json()).then(data=>{
             setNoticias(data);
             setCargando(false);
-            localStorage.setItem('taktik_ultima_' + catActiva, ahora.toString());
             localStorage.setItem('taktik_cache_' + catActiva, JSON.stringify(data));
-        });
-    } else {
-        if(cache){
-          setNoticias(JSON.parse(cache));
-          setCargando(false);
-        } else {
-          setCargando(true);
-          fetch("/api/noticias?cat=" + encodeURIComponent(catActiva))
-        .then(r=>r.json()).then(data=>{
-              setNoticias(data);
-              setCargando(false);
-              localStorage.setItem('taktik_ultima_' + catActiva, ahora.toString());
-              localStorage.setItem('taktik_cache_' + catActiva, JSON.stringify(data));
-          });
-        }
-    }
+        }).catch(()=>{
+            const cacheViejo = localStorage.getItem('taktik_cache_' + catActiva);
+            if(cacheViejo) setNoticias(JSON.parse(cacheViejo));
+            setCargando(false);
+        });  
   }, [catActiva]);
 
   const customFiltradas = custom.filter(c=>c.cat===catActiva);
