@@ -95,7 +95,7 @@ export async function GET(req){
 
     const filtradas = final.filter(n=>!n.title.toLowerCase().includes('guilfoyle') &&!n.title.toLowerCase().includes('grecia') && n.img &&!n.img.includes('google'));
 
-    return Response.json(filtradas.length>0? filtradas : final, { headers:{ 'Cache-Control':''no-store, no-cache, must-revalidate' } });
+    return Response.json(filtradas.length>0? filtradas : final, { headers:{ 'Cache-Control':'no-store, no-cache, must-revalidate' } });
 
   }catch(e){
     return Response.json([
